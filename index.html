@@ -22,15 +22,20 @@
       <span class="up">Scale Up <span class="gradient-text">Nano</span></span>
     </a>
     <ul class="nav-links">
-      <li><a href="index.html">Home</a></li>
-      <li><a href="activities.html">Activities</a></li>
-      <li><a href="projects.html">Projects</a></li>
-      <li><a href="members.html">Members</a></li>
-      <li><a href="opportunities.html">Opportunities</a></li>
-      <li><a href="links.html">Links</a></li>
-      <li><a href="memories.html">Memories</a></li>
-      <li><a href="join.html" class="nav-cta">Join</a></li>
+      <li><a href="index.html" data-i18n="nav.home">Home</a></li>
+      <li><a href="activities.html" data-i18n="nav.activities">Activities</a></li>
+      <li><a href="projects.html" data-i18n="nav.projects">Projects</a></li>
+      <li><a href="members.html" data-i18n="nav.members">Members</a></li>
+      <li><a href="opportunities.html" data-i18n="nav.opportunities">Opportunities</a></li>
+      <li><a href="links.html" data-i18n="nav.links">Links</a></li>
+      <li><a href="memories.html" data-i18n="nav.memories">Memories</a></li>
+      <li><a href="join.html" class="nav-cta" data-i18n="nav.join">Join</a></li>
     </ul>
+    <div class="lang-switch">
+      <button class="lang-btn" data-lang="en">EN</button>
+      <button class="lang-btn" data-lang="fr">FR</button>
+      <button class="lang-btn" data-lang="ar">AR</button>
+    </div>
     <button class="nav-toggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
   </div>
 </nav>
@@ -40,12 +45,12 @@
   <div class="orbit-mark">
     <img src="assets/logo-icon.jpg" alt="Scale Up Nano atom mark">
   </div>
-  <div class="eyebrow">School Scientific Club · NSNN</div>
-  <h1>Every idea scales up<br>into <span class="gradient-text">real discovery</span>.</h1>
-  <p class="lead">Scale Up Nano is a student-run community exploring nanoscience, robotics, code, and health — built by students, for students who want to build something real before graduation.</p>
+  <div class="eyebrow" data-i18n="home.eyebrow">School Scientific Club · NSNN</div>
+  <h1 data-i18n-html="home.title_html">Every idea scales up<br>into <span class="gradient-text">real discovery</span>.</h1>
+  <p class="lead" data-i18n="home.lead">Scale Up Nano is a student-run community exploring nanoscience, robotics, code, and health — built by students, for students who want to build something real before graduation.</p>
   <div class="hero-actions">
-    <a href="join.html" class="btn btn-primary">Join the club →</a>
-    <a href="projects.html" class="btn btn-ghost">See what we're building</a>
+    <a href="join.html" class="btn btn-primary" data-i18n="home.cta1">Join the club →</a>
+    <a href="projects.html" class="btn btn-ghost" data-i18n="home.cta2">See what we're building</a>
   </div>
 </header>
 
@@ -135,7 +140,7 @@
     <a href="memories.html">Memories</a>
     <a href="join.html">Join</a>
   </div>
-  <div class="fine">SCALE UP NANO · SCHOOL SCIENTIFIC CLUB · NSNN</div>
+  <div class="fine" data-i18n="footer.fine">SCALE UP NANO · SCHOOL SCIENTIFIC CLUB · NSNN</div>
 </footer>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -144,6 +149,7 @@
 <script src="js/firebase-init.js"></script>
 <script src="js/collections-config.js"></script>
 <script src="js/render-public.js"></script>
+<script src="js/i18n.js"></script>
 <script src="js/script.js"></script>
 </body>
 </html>

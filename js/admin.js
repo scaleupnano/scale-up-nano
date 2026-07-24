@@ -43,7 +43,7 @@ els.logoutBtn.addEventListener("click", function () {
 });
 
 /* ---------- Tab scaffolding ---------- */
-const TAB_ORDER = ["members", "projects", "activities", "opportunities", "links", "memories", "joinRequests"];
+const TAB_ORDER = ["members", "projects", "activities", "opportunities", "links", "memories", "memorySubmissions", "joinRequests"];
 const TAB_LABELS = {
   members: "Members",
   projects: "Projects",
@@ -51,6 +51,7 @@ const TAB_LABELS = {
   opportunities: "Opportunities",
   links: "Links",
   memories: "Memories",
+  memorySubmissions: "Memory submissions",
   joinRequests: "Join requests"
 };
 
@@ -86,6 +87,8 @@ function switchTab(key) {
 
   if (key === "joinRequests") {
     renderJoinRequests(panel);
+  } else if (key === "memorySubmissions") {
+    renderMemorySubmissions(panel);
   } else {
     renderCollectionPanel(key, panel);
   }
@@ -372,6 +375,62 @@ async function showSubmissions(activityId, activityTitle) {
 document.getElementById("modal-close").addEventListener("click", function () {
   document.getElementById("modal").style.display = "none";
 });
+
+/* ---------- Memory submissions (review queue, admin-only) ---------- */
+async function renderMemorySubmissions(panel) {
+  panel.innerHTML = '<div class="panel-head"><h2>Memory submissions</h2>' +
+    '<p class="muted">Approve to publish on the public Memories page, or reject to discard.</p></div>' +
+    '<div id="mem-sub-list"><p class="muted">Loading…</p></div>';
+  const listEl = document.getElementById("mem-sub-list");
+  const snap = await db.collection("memorySubmissions").orderBy("submittedAt", "desc").get();
+  if (snap.empty) {
+    listEl.innerHTML = "<p class='muted'>No submissions yet.</p>";
+    return;
+  }
+  listEl.innerHTML = "";
+  snap.forEach(function (doc) {
+    const d = doc.data();
+    const row = document.createElement("div");
+    row.className = "entry-row";
+    row.innerHTML =
+      '<div class="entry-info">' +
+        (d.photoURL ? '<img src="' + d.photoURL + '" class="current-photo" style="margin-bottom:8px;">' : '') +
+        '<div><strong>' + escapeHtml(d.title || "") + '</strong>' +
+        (d.status === "pending" ? ' <span class="status-badge status-delayed">PENDING</span>' : '') +
+        '</div><div class="muted small">' + escapeHtml(d.description || "") + '</div>' +
+        '<div class="muted small">From: ' + escapeHtml(d.name || "Anonymous") + '</div>' +
+      '</div><div class="entry-actions"></div>';
+
+    const actions = row.querySelector(".entry-actions");
+
+    const approveBtn = document.createElement("button");
+    approveBtn.className = "btn btn-primary btn-small";
+    approveBtn.textContent = "Approve → publish";
+    approveBtn.addEventListener("click", async function () {
+      await db.collection("memories").add({
+        title: d.title, description: d.description, photoURL: d.photoURL || "",
+        date: "", order: 0
+      });
+      await db.collection("memorySubmissions").doc(doc.id).delete();
+      panel.dataset.loaded = "";
+      renderMemorySubmissions(panel);
+    });
+    actions.appendChild(approveBtn);
+
+    const rejectBtn = document.createElement("button");
+    rejectBtn.className = "btn btn-ghost btn-small danger";
+    rejectBtn.textContent = "Reject";
+    rejectBtn.addEventListener("click", async function () {
+      if (!confirm("Discard this submission?")) return;
+      await db.collection("memorySubmissions").doc(doc.id).delete();
+      panel.dataset.loaded = "";
+      renderMemorySubmissions(panel);
+    });
+    actions.appendChild(rejectBtn);
+
+    listEl.appendChild(row);
+  });
+}
 
 /* ---------- Join requests (admin-only view) ---------- */
 async function renderJoinRequests(panel) {

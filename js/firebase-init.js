@@ -16,8 +16,7 @@ const firebaseConfig = {
   projectId: "scale-up-nano",
   storageBucket: "scale-up-nano.firebasestorage.app",
   messagingSenderId: "1075963546243",
-  appId: "1:1075963546243:web:7e0921d622fad9694c29b6",
-  measurementId: "G-FFVB7K9FT1"
+  appId: "1:1075963546243:web:7e0921d622fad9694c29b6"
 };
 
 firebase.initializeApp(firebaseConfig);

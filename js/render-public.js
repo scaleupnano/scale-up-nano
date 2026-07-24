@@ -187,6 +187,50 @@ const RENDERERS = {
         '<p>' + escapeHtml(d.description || "") + '</p>';
       container.appendChild(card);
     });
+  },
+
+  shareMemoryForm: function (container) {
+    container.innerHTML =
+      '<form id="memory-submit-form" class="card join-card" style="max-width:520px;">' +
+        '<h3 style="margin-bottom:6px;">Share a memory</h3>' +
+        '<p class="muted" style="margin-bottom:20px;">Add a photo and a line about a session or event — it\'ll show up here once approved.</p>' +
+        '<div class="form-row-compact"><label>Your name (optional)</label><input type="text" id="mem-name"></div>' +
+        '<div class="form-row-compact"><label>Title</label><input type="text" id="mem-title" required></div>' +
+        '<div class="form-row-compact"><label>What happened?</label><textarea id="mem-desc" rows="3" required></textarea></div>' +
+        '<div class="form-row-compact"><label>Photo (optional, under 5MB)</label><input type="file" id="mem-photo" accept="image/*"></div>' +
+        '<button type="submit" class="btn btn-primary" style="margin-top:6px;">Submit for review</button>' +
+        '<p id="mem-status" class="form-status muted small"></p>' +
+      '</form>';
+
+    document.getElementById("memory-submit-form").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const btn = e.target.querySelector('button[type="submit"]');
+      const status = document.getElementById("mem-status");
+      const title = document.getElementById("mem-title").value.trim();
+      const desc = document.getElementById("mem-desc").value.trim();
+      const name = document.getElementById("mem-name").value.trim();
+      const file = document.getElementById("mem-photo").files[0];
+
+      btn.disabled = true;
+      btn.textContent = "Submitting…";
+      try {
+        let photoURL = "";
+        if (file) {
+          const ref = storage.ref("memory-submissions/" + Date.now() + "_" + file.name);
+          await ref.put(file);
+          photoURL = await ref.getDownloadURL();
+        }
+        await db.collection("memorySubmissions").add({
+          name: name, title: title, description: desc, photoURL: photoURL,
+          status: "pending", submittedAt: Date.now()
+        });
+        e.target.innerHTML = "<p class='form-status'>Thanks — your memory is in for review and will appear once approved.</p>";
+      } catch (err) {
+        status.textContent = "Couldn't submit: " + err.message;
+        btn.disabled = false;
+        btn.textContent = "Submit for review";
+      }
+    });
   }
 };
 

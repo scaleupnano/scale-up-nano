@@ -10,6 +10,15 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
+
+    // Visitors can attach a photo to a memory submission — capped at 5MB,
+    // images only. Everything else still requires an admin sign-in.
+    match /memory-submissions/{fileName} {
+      allow read: if true;
+      allow create: if request.resource.size < 5 * 1024 * 1024
+                    && request.resource.contentType.matches('image/.*');
+    }
+
     match /{allPaths=**} {
       allow read: if true;
       allow write: if request.auth != null;

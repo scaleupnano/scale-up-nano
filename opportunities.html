@@ -22,23 +22,28 @@
       <span class="up">Scale Up <span class="gradient-text">Nano</span></span>
     </a>
     <ul class="nav-links">
-      <li><a href="index.html">Home</a></li>
-      <li><a href="activities.html">Activities</a></li>
-      <li><a href="projects.html">Projects</a></li>
-      <li><a href="members.html">Members</a></li>
-      <li><a href="opportunities.html">Opportunities</a></li>
-      <li><a href="links.html">Links</a></li>
-      <li><a href="memories.html">Memories</a></li>
-      <li><a href="join.html" class="nav-cta">Join</a></li>
+      <li><a href="index.html" data-i18n="nav.home">Home</a></li>
+      <li><a href="activities.html" data-i18n="nav.activities">Activities</a></li>
+      <li><a href="projects.html" data-i18n="nav.projects">Projects</a></li>
+      <li><a href="members.html" data-i18n="nav.members">Members</a></li>
+      <li><a href="opportunities.html" data-i18n="nav.opportunities">Opportunities</a></li>
+      <li><a href="links.html" data-i18n="nav.links">Links</a></li>
+      <li><a href="memories.html" data-i18n="nav.memories">Memories</a></li>
+      <li><a href="join.html" class="nav-cta" data-i18n="nav.join">Join</a></li>
     </ul>
+    <div class="lang-switch">
+      <button class="lang-btn" data-lang="en">EN</button>
+      <button class="lang-btn" data-lang="fr">FR</button>
+      <button class="lang-btn" data-lang="ar">AR</button>
+    </div>
     <button class="nav-toggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
   </div>
 </nav>
 
 <header class="hero" style="padding-top:64px; padding-bottom:40px;">
-  <div class="eyebrow">Opportunities</div>
-  <h1 style="font-size:clamp(28px,4.4vw,44px);">Internships, competitions &amp; grants</h1>
-  <p class="lead">A running list of opportunities relevant to nanoscience, robotics, code, and health — curated by the club for its members.</p>
+  <div class="eyebrow" data-i18n="opportunities.eyebrow">Opportunities</div>
+  <h1 style="font-size:clamp(28px,4.4vw,44px);" data-i18n="opportunities.title">Internships, competitions &amp; grants</h1>
+  <p class="lead" data-i18n="opportunities.lead">A running list of opportunities relevant to nanoscience, robotics, code, and health — curated by the club for its members.</p>
 </header>
 
 <section class="section">
@@ -62,7 +67,7 @@
     <a href="memories.html">Memories</a>
     <a href="join.html">Join</a>
   </div>
-  <div class="fine">SCALE UP NANO · SCHOOL SCIENTIFIC CLUB · NSNN</div>
+  <div class="fine" data-i18n="footer.fine">SCALE UP NANO · SCHOOL SCIENTIFIC CLUB · NSNN</div>
 </footer>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -71,6 +76,7 @@
 <script src="js/firebase-init.js"></script>
 <script src="js/collections-config.js"></script>
 <script src="js/render-public.js"></script>
+<script src="js/i18n.js"></script>
 <script src="js/script.js"></script>
 </body>
 </html>
