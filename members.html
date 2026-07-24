@@ -7,7 +7,7 @@
 <title>Members — Scale Up Nano</title>
 <link rel="icon" href="assets/favicon.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -28,6 +28,7 @@
       <li><a href="members.html">Members</a></li>
       <li><a href="opportunities.html">Opportunities</a></li>
       <li><a href="links.html">Links</a></li>
+      <li><a href="memories.html">Memories</a></li>
       <li><a href="join.html" class="nav-cta">Join</a></li>
     </ul>
     <button class="nav-toggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
@@ -42,55 +43,11 @@
 
 <section class="section">
   <div class="section-head">
-    <div class="eyebrow">Core team</div>
-    <h2>Organizers</h2>
+    <div class="eyebrow">The roster</div>
+    <h2>Organizers &amp; lab leads</h2>
+    <p>Add each person from the admin dashboard — name, role, and a photo if you have one.</p>
   </div>
-  <div class="grid grid-3">
-    <div class="card member-card">
-      <div class="avatar" data-editable>[ + ]</div>
-      <h3 data-editable>[ Name ]</h3>
-      <p data-editable>[ Role — e.g. President ]</p>
-    </div>
-    <div class="card member-card">
-      <div class="avatar" data-editable>[ + ]</div>
-      <h3 data-editable>[ Name ]</h3>
-      <p data-editable>[ Role — e.g. Vice President ]</p>
-    </div>
-    <div class="card member-card">
-      <div class="avatar" data-editable>[ + ]</div>
-      <h3 data-editable>[ Name ]</h3>
-      <p data-editable>[ Role — e.g. Treasurer ]</p>
-    </div>
-  </div>
-</section>
-
-<section class="section">
-  <div class="section-head">
-    <div class="eyebrow">Lab leads</div>
-    <h2>One per track</h2>
-  </div>
-  <div class="grid grid-3">
-    <div class="card member-card">
-      <div class="avatar" data-editable>[ + ]</div>
-      <h3 data-editable>[ Name ]</h3>
-      <p data-editable>[ Nanoscience lead ]</p>
-    </div>
-    <div class="card member-card">
-      <div class="avatar" data-editable>[ + ]</div>
-      <h3 data-editable>[ Name ]</h3>
-      <p data-editable>[ Robotics lead ]</p>
-    </div>
-    <div class="card member-card">
-      <div class="avatar" data-editable>[ + ]</div>
-      <h3 data-editable>[ Name ]</h3>
-      <p data-editable>[ Code lead ]</p>
-    </div>
-    <div class="card member-card">
-      <div class="avatar" data-editable>[ + ]</div>
-      <h3 data-editable>[ Name ]</h3>
-      <p data-editable>[ Health lead ]</p>
-    </div>
-  </div>
+  <div class="grid grid-3" data-render="members"></div>
 </section>
 
 <section class="section" style="text-align:center;">
@@ -107,11 +64,18 @@
     <a href="members.html">Members</a>
     <a href="opportunities.html">Opportunities</a>
     <a href="links.html">Links</a>
+    <a href="memories.html">Memories</a>
     <a href="join.html">Join</a>
   </div>
   <div class="fine">SCALE UP NANO · SCHOOL SCIENTIFIC CLUB · NSNN</div>
 </footer>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="js/firebase-init.js"></script>
+<script src="js/collections-config.js"></script>
+<script src="js/render-public.js"></script>
 <script src="js/script.js"></script>
 </body>
 </html>

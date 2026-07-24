@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Admin — Scale Up Nano</title>
+<link rel="icon" href="assets/favicon.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="admin-body">
+
+<div id="login-screen" class="login-screen">
+  <form id="login-form" class="login-card">
+    <img src="assets/logo-icon.jpg" alt="Scale Up Nano" class="login-logo">
+    <h1>Admin sign-in</h1>
+    <p class="muted">Sign in with the admin account created in Firebase Authentication.</p>
+    <label>Email</label>
+    <input type="email" id="login-email" required>
+    <label>Password</label>
+    <input type="password" id="login-password" required>
+    <p id="login-error" class="error-text"></p>
+    <button type="submit" class="btn btn-primary" style="width:100%;">Sign in</button>
+    <a href="index.html" class="back-link">← Back to site</a>
+  </form>
+</div>
+
+<div id="dashboard" class="dashboard" style="display:none;">
+  <header class="admin-header">
+    <div class="brand">
+      <img src="assets/logo-icon.jpg" alt="Scale Up Nano">
+      <span>Scale Up Nano — Admin</span>
+    </div>
+    <div>
+      <a href="index.html" class="btn btn-ghost btn-small">View site</a>
+      <button id="logout-btn" class="btn btn-ghost btn-small">Sign out</button>
+    </div>
+  </header>
+
+  <nav id="tabs" class="admin-tabs"></nav>
+  <main id="panels" class="admin-panels"></main>
+</div>
+
+<div id="modal" class="modal" style="display:none;">
+  <div class="modal-card">
+    <button id="modal-close" class="modal-close">✕</button>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+<script src="js/firebase-init.js"></script>
+<script src="js/collections-config.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

@@ -1,64 +1,144 @@
-# Scale Up Nano — Website
+# Scale Up Nano — Website (with real admin dashboard)
 
-A full static site for the Scale Up Nano school scientific club: Home, Activities,
-Projects, Members, Opportunities, Links, and Join pages, sharing one stylesheet
-and one script file.
+A full static site for the Scale Up Nano school scientific club, backed by
+Firebase so you get a real admin dashboard — persistent edits, photo
+uploads, per-activity forms with private results, and a memories page —
+without touching GitHub for routine updates.
 
-## Structure
+## What's in this version
 
+- **Public site**: Home, Activities, Projects, Members, Opportunities,
+  Links, Memories, Join — all pulling live content from Firestore.
+- **`admin.html`**: a password-protected dashboard where you add/edit/delete
+  everything, upload photos, set an activity's status (Upcoming / Done /
+  Delayed / Cancelled), attach a custom sign-up or feedback form to any
+  activity, and view that activity's submissions — visible only to you.
+- **Join requests**: the Join page's form now saves to Firestore instead of
+  going nowhere; you view submissions from the admin dashboard.
+
+Nothing here needs a rebuild or redeploy to update content — only actual
+code/design changes need a new GitHub commit.
+
+---
+
+## Part 1 — Firebase setup (do this once)
+
+You said you already have a Firebase project from before — if it's a fresh
+one, these are the exact steps either way.
+
+### 1. Create/open your project
+Go to [console.firebase.google.com](https://console.firebase.google.com) →
+create a project (or open your existing one).
+
+### 2. Register a Web App
+- In your project, click the **</>** (web) icon to add a web app
+- Give it any nickname (e.g. "Scale Up Nano site")
+- You do **not** need Firebase Hosting — you're hosting on GitHub Pages
+- After registering, Firebase shows a `firebaseConfig` object — copy it
+
+### 3. Paste your config into the site
+Open **`js/firebase-init.js`** and replace the placeholder values with the
+real ones from step 2:
+
+```js
+const firebaseConfig = {
+  apiKey: "...",
+  authDomain: "...",
+  projectId: "...",
+  storageBucket: "...",
+  messagingSenderId: "...",
+  appId: "..."
+};
 ```
-scale-up-nano/
-├── index.html          Home
-├── activities.html      Sessions & workshops
-├── projects.html        Member projects
-├── members.html         Organizers & lab leads
-├── opportunities.html   Internships, competitions, grants
-├── links.html           Link-in-bio style page
-├── join.html            Join form + Discord CTA
-├── css/style.css        Shared styles
-├── js/script.js         Nav toggle, admin mode, join form handler
-└── assets/               Logo images
-```
 
-## Filling in real content
+### 4. Enable Firestore
+- Left sidebar → **Build → Firestore Database → Create database**
+- Choose **Production mode** (we're supplying our own rules below)
+- Pick any region close to you
 
-Every bracketed field like `[ Session title ]` or `[ Name ]` is a placeholder.
-The fastest way to fill them in:
+### 5. Enable Storage
+- Left sidebar → **Build → Storage → Get started**
+- Same production-mode choice, same region
 
-1. Open the site in a browser and add `#aymen` to the end of the URL
-   (e.g. `index.html#aymen`).
-2. An **ADMIN MODE** badge appears and every bracketed field becomes clickable
-   — click into one and type over it.
-3. This only edits the page in your current browser tab; it is **not saved**
-   anywhere, because this is a static site with no backend/database. Once a
-   page looks right, open its `.html` file in a text editor and replace the
-   matching placeholder text with what you typed, or just retype it directly
-   in the file. Then re-upload/redeploy.
+### 6. Enable Authentication (this is what protects your admin page)
+- Left sidebar → **Build → Authentication → Get started**
+- Under **Sign-in method**, enable **Email/Password**
+- Go to the **Users** tab → **Add user** → enter the email + password
+  *you personally* will use to log into `admin.html`. This is your only
+  admin account — anyone without this email/password cannot get in.
 
-If you'd rather skip the in-browser step, just search each `.html` file for
-text in `[ brackets ]` and replace it directly — it's plain HTML.
+### 7. Set the security rules
+- **Firestore Database → Rules tab** → replace the contents with everything
+  in `firestore.rules` (included in this zip) → **Publish**
+- **Storage → Rules tab** → replace the contents with everything in
+  `storage.rules` (included in this zip) → **Publish**
 
-## Hooking up the Join form
+These rules mean: anyone can *view* your site's content and photos, anyone
+can *submit* a join request or activity form, but only you (signed in)
+can add/edit/delete anything or read submitted forms.
 
-`join.html` has a working form with name/email/track/note fields, but nothing
-receives the submissions yet (`js/script.js` just shows a confirmation
-message). To actually collect responses, pick one:
+### 8. Add your GitHub Pages domain to the allowed list
+- **Authentication → Settings → Authorized domains → Add domain**
+- Add `scaleupnano.github.io` (your Pages domain)
 
-- A form backend like Formspree, Getform, or Google Forms embedded instead.
-- A small serverless function that posts to a Discord webhook or a database.
-- A Google Sheet via a simple Apps Script web app endpoint.
+---
 
-## Hosting
+## Part 2 — Push to GitHub
 
-This is a plain static site — any static host works:
+Replace everything in your `scaleupnano/scale-up-nano` repo with the
+contents of this zip (delete the old files first, or just overwrite —
+either works since the filenames are mostly the same, plus a few new ones:
+`admin.html`, `memories.html`, `firestore.rules`, `storage.rules`, and new
+files under `js/`).
 
-- **GitHub Pages**: push this folder to a repo, enable Pages on the `main`
-  branch, done.
-- **Netlify / Vercel**: drag-and-drop the folder onto their dashboard, or
-  connect the repo for automatic deploys.
-- **Any shared host / cPanel**: upload the contents of this folder to your
-  site's public/www directory.
+Make sure `.nojekyll` (from before) is still in the repo root — if you
+deleted it during the overwrite, recreate that empty file.
 
-No build step, no dependencies to install — the two Google Fonts (`Space
-Grotesk`, `Inter`) load from Google's CDN, so an internet connection is
-needed for those, but the rest of the site works fully offline too.
+Settings → Pages should already be correctly configured from last time
+(`main` branch, root folder) — no changes needed there.
+
+---
+
+## Part 3 — Using the admin dashboard
+
+1. Visit `https://scaleupnano.github.io/scale-up-nano/admin.html`
+2. Sign in with the email/password you created in Part 1, step 6
+3. Use the tabs across the top: **Members, Projects, Activities,
+   Opportunities, Links, Memories, Join requests**
+
+For each of the first six tabs: fill out the form at the top to add a new
+entry (photos upload directly — just pick a file), and existing entries
+list below with **Edit** and **Delete** buttons.
+
+### Activities — status and forms
+- Every activity has a **Status** dropdown (Upcoming / Done / Delayed /
+  Cancelled) — change it any time and the public Activities page updates
+  immediately, badge and all.
+- Below the normal fields, there's a **"Sign-up / feedback form"** builder —
+  click **+ Add question**, type a label (e.g. "Will you attend?"), pick a
+  type (text / textarea / number / email / select), repeat for as many
+  questions as you want. Leave it empty if this activity doesn't need a form.
+- Once saved, that form appears live on the public Activities page under
+  that activity's card. Visitors fill it in and submit.
+- Back in admin, click **View submissions** on that activity to see every
+  response — this is not visible anywhere on the public site.
+
+### Join requests
+Anyone who submits the Join page's form shows up here — name, email,
+which track they're interested in, and their note. Delete once handled.
+
+---
+
+## A few honest notes
+
+- **This is a genuine password-gated admin page**, not a cosmetic one —
+  only the email/password you created in Firebase Authentication can sign
+  in and make changes.
+- Firebase's free tier (Spark plan) comfortably covers a club site like
+  this — you won't hit billing unless traffic gets very large.
+- If you ever forget your admin password, reset it from Firebase Console →
+  Authentication → Users → (your user) → Reset password, or just delete
+  and re-add the user.
+- Photo uploads go to Firebase Storage and are public URLs (anyone with the
+  link can view the image) — normal for a public club site, just don't
+  upload anything sensitive.

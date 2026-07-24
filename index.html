@@ -7,7 +7,7 @@
 <title>Scale Up Nano — School Scientific Club</title>
 <link rel="icon" href="assets/favicon.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -28,6 +28,7 @@
       <li><a href="members.html">Members</a></li>
       <li><a href="opportunities.html">Opportunities</a></li>
       <li><a href="links.html">Links</a></li>
+      <li><a href="memories.html">Memories</a></li>
       <li><a href="join.html" class="nav-cta">Join</a></li>
     </ul>
     <button class="nav-toggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
@@ -93,17 +94,17 @@
     <div class="eyebrow">By the numbers</div>
     <h2>A young club, moving fast</h2>
   </div>
-  <div class="grid grid-3">
+  <div class="grid grid-3" data-render="stats">
     <div class="card" style="text-align:center;">
-      <h3 style="font-size:34px;" class="gradient-text" data-editable data-placeholder="[ 00 ]">[ 00 ]</h3>
+      <h3 style="font-size:34px;" class="gradient-text" data-stat="members">0</h3>
       <p>Active members</p>
     </div>
     <div class="card" style="text-align:center;">
-      <h3 style="font-size:34px;" class="gradient-text" data-editable data-placeholder="[ 00 ]">[ 00 ]</h3>
+      <h3 style="font-size:34px;" class="gradient-text" data-stat="activities">0</h3>
       <p>Sessions run so far</p>
     </div>
     <div class="card" style="text-align:center;">
-      <h3 style="font-size:34px;" class="gradient-text" data-editable data-placeholder="[ 00 ]">[ 00 ]</h3>
+      <h3 style="font-size:34px;" class="gradient-text" data-stat="projects">0</h3>
       <p>Projects in progress</p>
     </div>
   </div>
@@ -114,9 +115,7 @@
     <div class="eyebrow">Next up</div>
     <h2>Upcoming session</h2>
   </div>
-  <div class="grid" style="max-width:720px;">
-    <div class="slot" data-editable>[ Add your next event title, date, time and room here — see the Activities page for the full format. ]</div>
-  </div>
+  <div class="grid" style="max-width:720px;" data-render="nextEvent"></div>
 </section>
 
 <section class="section" style="text-align:center;">
@@ -133,11 +132,18 @@
     <a href="members.html">Members</a>
     <a href="opportunities.html">Opportunities</a>
     <a href="links.html">Links</a>
+    <a href="memories.html">Memories</a>
     <a href="join.html">Join</a>
   </div>
   <div class="fine">SCALE UP NANO · SCHOOL SCIENTIFIC CLUB · NSNN</div>
 </footer>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="js/firebase-init.js"></script>
+<script src="js/collections-config.js"></script>
+<script src="js/render-public.js"></script>
 <script src="js/script.js"></script>
 </body>
 </html>

@@ -7,7 +7,7 @@
 <title>Activities — Scale Up Nano</title>
 <link rel="icon" href="assets/favicon.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -28,6 +28,7 @@
       <li><a href="members.html">Members</a></li>
       <li><a href="opportunities.html">Opportunities</a></li>
       <li><a href="links.html">Links</a></li>
+      <li><a href="memories.html">Memories</a></li>
       <li><a href="join.html" class="nav-cta">Join</a></li>
     </ul>
     <button class="nav-toggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
@@ -46,48 +47,7 @@
     <h2>This term</h2>
     <p>Add each session as it's confirmed — date, time, room, and a short line on what it covers.</p>
   </div>
-  <div class="grid grid-2">
-    <div class="card">
-      <span class="tag" data-editable>[ TRACK ]</span>
-      <h3 data-editable>[ Session title ]</h3>
-      <p data-editable>[ A short line describing what the session covers and why members should show up. ]</p>
-      <div class="meta">
-        <span data-editable>📅 [ DD / MM ]</span>
-        <span data-editable>🕒 [ HH:MM ]</span>
-        <span data-editable>📍 [ Room / Hall ]</span>
-      </div>
-    </div>
-    <div class="card">
-      <span class="tag" data-editable>[ TRACK ]</span>
-      <h3 data-editable>[ Session title ]</h3>
-      <p data-editable>[ A short line describing what the session covers and why members should show up. ]</p>
-      <div class="meta">
-        <span data-editable>📅 [ DD / MM ]</span>
-        <span data-editable>🕒 [ HH:MM ]</span>
-        <span data-editable>📍 [ Room / Hall ]</span>
-      </div>
-    </div>
-    <div class="card">
-      <span class="tag" data-editable>[ TRACK ]</span>
-      <h3 data-editable>[ Session title ]</h3>
-      <p data-editable>[ A short line describing what the session covers and why members should show up. ]</p>
-      <div class="meta">
-        <span data-editable>📅 [ DD / MM ]</span>
-        <span data-editable>🕒 [ HH:MM ]</span>
-        <span data-editable>📍 [ Room / Hall ]</span>
-      </div>
-    </div>
-    <div class="card">
-      <span class="tag" data-editable>[ TRACK ]</span>
-      <h3 data-editable>[ Session title ]</h3>
-      <p data-editable>[ A short line describing what the session covers and why members should show up. ]</p>
-      <div class="meta">
-        <span data-editable>📅 [ DD / MM ]</span>
-        <span data-editable>🕒 [ HH:MM ]</span>
-        <span data-editable>📍 [ Room / Hall ]</span>
-      </div>
-    </div>
-  </div>
+  <div class="grid grid-2" data-render="activities"></div>
 </section>
 
 <section class="section">
@@ -122,11 +82,18 @@
     <a href="members.html">Members</a>
     <a href="opportunities.html">Opportunities</a>
     <a href="links.html">Links</a>
+    <a href="memories.html">Memories</a>
     <a href="join.html">Join</a>
   </div>
   <div class="fine">SCALE UP NANO · SCHOOL SCIENTIFIC CLUB · NSNN</div>
 </footer>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="js/firebase-init.js"></script>
+<script src="js/collections-config.js"></script>
+<script src="js/render-public.js"></script>
 <script src="js/script.js"></script>
 </body>
 </html>

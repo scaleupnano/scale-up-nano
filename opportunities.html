@@ -7,7 +7,7 @@
 <title>Opportunities — Scale Up Nano</title>
 <link rel="icon" href="assets/favicon.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -28,6 +28,7 @@
       <li><a href="members.html">Members</a></li>
       <li><a href="opportunities.html">Opportunities</a></li>
       <li><a href="links.html">Links</a></li>
+      <li><a href="memories.html">Memories</a></li>
       <li><a href="join.html" class="nav-cta">Join</a></li>
     </ul>
     <button class="nav-toggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
@@ -41,44 +42,7 @@
 </header>
 
 <section class="section">
-  <div class="grid grid-2">
-    <div class="card">
-      <span class="tag" data-editable>[ INTERNSHIP ]</span>
-      <h3 data-editable>[ Opportunity title ]</h3>
-      <p data-editable>[ One line on who it's for and what it involves. ]</p>
-      <div class="meta">
-        <span data-editable>🏷 [ Organization ]</span>
-        <span data-editable>⏳ [ Deadline ]</span>
-      </div>
-    </div>
-    <div class="card">
-      <span class="tag" data-editable>[ COMPETITION ]</span>
-      <h3 data-editable>[ Opportunity title ]</h3>
-      <p data-editable>[ One line on who it's for and what it involves. ]</p>
-      <div class="meta">
-        <span data-editable>🏷 [ Organization ]</span>
-        <span data-editable>⏳ [ Deadline ]</span>
-      </div>
-    </div>
-    <div class="card">
-      <span class="tag" data-editable>[ GRANT ]</span>
-      <h3 data-editable>[ Opportunity title ]</h3>
-      <p data-editable>[ One line on who it's for and what it involves. ]</p>
-      <div class="meta">
-        <span data-editable>🏷 [ Organization ]</span>
-        <span data-editable>⏳ [ Deadline ]</span>
-      </div>
-    </div>
-    <div class="card">
-      <span class="tag" data-editable>[ CALL FOR PAPERS ]</span>
-      <h3 data-editable>[ Opportunity title ]</h3>
-      <p data-editable>[ One line on who it's for and what it involves. ]</p>
-      <div class="meta">
-        <span data-editable>🏷 [ Organization ]</span>
-        <span data-editable>⏳ [ Deadline ]</span>
-      </div>
-    </div>
-  </div>
+  <div class="grid grid-2" data-render="opportunities"></div>
 </section>
 
 <section class="section" style="text-align:center;">
@@ -95,11 +59,18 @@
     <a href="members.html">Members</a>
     <a href="opportunities.html">Opportunities</a>
     <a href="links.html">Links</a>
+    <a href="memories.html">Memories</a>
     <a href="join.html">Join</a>
   </div>
   <div class="fine">SCALE UP NANO · SCHOOL SCIENTIFIC CLUB · NSNN</div>
 </footer>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="js/firebase-init.js"></script>
+<script src="js/collections-config.js"></script>
+<script src="js/render-public.js"></script>
 <script src="js/script.js"></script>
 </body>
 </html>

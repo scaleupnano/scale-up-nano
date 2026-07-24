@@ -1,0 +1,52 @@
+// ==========================================================================
+// Scale Up Nano — Firestore security rules
+//
+// Paste this into: Firebase Console → Firestore Database → Rules tab → Publish
+//
+// Logic:
+//  - Public content (members, projects, activities, opportunities, links,
+//    memories) can be READ by anyone, but only WRITTEN by a signed-in admin.
+//  - formSubmissions and joinRequests can be CREATED by anyone (so visitors
+//    can submit forms without an account), but can only be READ, edited, or
+//    deleted by a signed-in admin — that's what keeps results private.
+// ==========================================================================
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /members/{id} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /projects/{id} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /activities/{id} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /opportunities/{id} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /links/{id} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    match /memories/{id} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
+    match /formSubmissions/{id} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null;
+    }
+    match /joinRequests/{id} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null;
+    }
+  }
+}
