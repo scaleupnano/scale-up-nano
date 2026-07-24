@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Join Scale Up Nano, a student science and technology club.">
+<title>Join — Scale Up Nano</title>
+<link rel="icon" href="assets/favicon.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<span class="admin-badge">ADMIN MODE</span>
+<div class="admin-banner">Admin mode active — bracketed fields across the site are now editable in this browser tab.</div>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand">
+      <img src="assets/logo-icon.jpg" alt="Scale Up Nano">
+      <span class="up">Scale Up <span class="gradient-text">Nano</span></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="activities.html">Activities</a></li>
+      <li><a href="projects.html">Projects</a></li>
+      <li><a href="members.html">Members</a></li>
+      <li><a href="opportunities.html">Opportunities</a></li>
+      <li><a href="links.html">Links</a></li>
+      <li><a href="join.html" class="nav-cta">Join</a></li>
+    </ul>
+    <button class="nav-toggle" aria-label="Toggle menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<header class="hero" style="padding-top:64px; padding-bottom:24px;">
+  <div class="eyebrow">Join</div>
+  <h1 style="font-size:clamp(28px,4.4vw,44px);">Become a member</h1>
+  <p class="lead">No prerequisite background needed — just fill this out, or jump straight into our Discord.</p>
+</header>
+
+<section class="section" style="padding-top:0;">
+  <div class="card join-card">
+    <a href="#" class="btn btn-primary" data-editable data-placeholder="[ Join via Discord → ]">[ Join via Discord → ]</a>
+
+    <form id="join-form" class="form-row">
+      <div>
+        <label for="name">Full name</label>
+        <input type="text" id="name" name="name" required>
+      </div>
+      <div>
+        <label for="email">School email</label>
+        <input type="email" id="email" name="email" required>
+      </div>
+      <div>
+        <label for="track">Which lab interests you most?</label>
+        <select id="track" name="track">
+          <option>Nanoscience</option>
+          <option>Robotics</option>
+          <option>Code</option>
+          <option>Health</option>
+          <option>Not sure yet</option>
+        </select>
+      </div>
+      <div>
+        <label for="note">Anything you want to build or learn?</label>
+        <textarea id="note" name="note" rows="3"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary" style="margin-top:6px;">Submit</button>
+      <p id="join-status" class="form-note"></p>
+    </form>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="foot-links">
+    <a href="index.html">Home</a>
+    <a href="activities.html">Activities</a>
+    <a href="projects.html">Projects</a>
+    <a href="members.html">Members</a>
+    <a href="opportunities.html">Opportunities</a>
+    <a href="links.html">Links</a>
+    <a href="join.html">Join</a>
+  </div>
+  <div class="fine">SCALE UP NANO · SCHOOL SCIENTIFIC CLUB · NSNN</div>
+</footer>
+
+<script src="js/script.js"></script>
+</body>
+</html>
