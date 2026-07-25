@@ -23,4 +23,6 @@ firebase.initializeApp(firebaseConfig);
 
 const db = firebase.firestore();
 const auth = firebase.auth();
-const storage = firebase.storage();
+/* Storage is intentionally not initialized — photos are compressed
+   client-side and stored directly in Firestore instead, so this site
+   works entirely on Firebase's free Spark plan with no billing setup. */

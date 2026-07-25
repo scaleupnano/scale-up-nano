@@ -389,10 +389,7 @@ async function submitEntry(collectionKey, schema, formEl) {
 
   try {
     for (const item of fileInputs) {
-      const path = collectionKey + "/" + Date.now() + "_" + item.file.name;
-      const ref = storage.ref(path);
-      await withTimeout(ref.put(item.file), "Photo upload");
-      data[item.key] = await withTimeout(ref.getDownloadURL(), "Fetching photo URL");
+      data[item.key] = await compressImageToDataURL(item.file, 900, 0.72);
     }
 
     if (docId) {
@@ -507,6 +504,8 @@ async function showSubmissions(activityId, activityTitle) {
       const val = String(d.answers[k]);
       const display = /^https?:\/\//.test(val)
         ? '<a href="' + val + '" target="_blank" rel="noopener" style="color:var(--cyan);">View file →</a>'
+        : /^data:image\//.test(val)
+        ? '<a href="' + val + '" target="_blank" rel="noopener"><img src="' + val + '" style="max-width:160px; border-radius:8px; margin-top:6px; display:block;"></a>'
         : escapeHtml(val);
       return "<div><strong>" + escapeHtml(k) + ":</strong> " + display + "</div>";
     }).join("");

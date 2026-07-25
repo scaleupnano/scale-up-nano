@@ -250,9 +250,7 @@ const RENDERERS = {
       try {
         let photoURL = "";
         if (file) {
-          const ref = storage.ref("memory-submissions/" + Date.now() + "_" + file.name);
-          await withTimeout(ref.put(file), "Photo upload");
-          photoURL = await withTimeout(ref.getDownloadURL(), "Fetching photo URL");
+          photoURL = await compressImageToDataURL(file, 900, 0.7);
         }
         await withTimeout(db.collection("memorySubmissions").add({
           name: name, title: title, description: desc, photoURL: photoURL,
@@ -334,9 +332,7 @@ function buildActivityForm(eventId, formFields) {
           const fileInput = wrap.querySelector('[name="' + f.id + '"]');
           const file = fileInput.files[0];
           if (file) {
-            const ref = storage.ref("form-uploads/" + eventId + "/" + Date.now() + "_" + file.name);
-            await withTimeout(ref.put(file), "Photo upload");
-            answers[f.label] = await withTimeout(ref.getDownloadURL(), "Fetching photo URL");
+            answers[f.label] = await compressImageToDataURL(file, 700, 0.65);
           } else {
             answers[f.label] = "";
           }

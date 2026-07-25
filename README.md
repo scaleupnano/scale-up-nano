@@ -56,28 +56,27 @@ const firebaseConfig = {
 - Choose **Production mode** (we're supplying our own rules below)
 - Pick any region close to you
 
-### 5. Enable Storage
-- Left sidebar → **Build → Storage → Get started**
-- Same production-mode choice, same region
-
-### 6. Enable Authentication (this is what protects your admin page)
+### 5. Enable Authentication (this is what protects your admin page)
 - Left sidebar → **Build → Authentication → Get started**
 - Under **Sign-in method**, enable **Email/Password**
 - Go to the **Users** tab → **Add user** → enter the email + password
   *you personally* will use to log into `admin.html`. This is your only
   admin account — anyone without this email/password cannot get in.
 
-### 7. Set the security rules
+### 6. Set the security rules
 - **Firestore Database → Rules tab** → replace the contents with everything
   in `firestore.rules` (included in this zip) → **Publish**
-- **Storage → Rules tab** → replace the contents with everything in
-  `storage.rules` (included in this zip) → **Publish**
+
+(`storage.rules` is also included but not currently needed — see the note
+at the top of that file. Photos are compressed in the browser and stored
+directly in Firestore, so there's no Storage bucket to configure and no
+paid Blaze plan required anywhere in this setup.)
 
 These rules mean: anyone can *view* your site's content and photos, anyone
 can *submit* a join request or activity form, but only you (signed in)
 can add/edit/delete anything or read submitted forms.
 
-### 8. Add your GitHub Pages domain to the allowed list
+### 7. Add your GitHub Pages domain to the allowed list
 - **Authentication → Settings → Authorized domains → Add domain**
 - Add `scaleupnano.github.io` (your Pages domain)
 
@@ -147,6 +146,9 @@ which track they're interested in, and their note. Delete once handled.
 - If you ever forget your admin password, reset it from Firebase Console →
   Authentication → Users → (your user) → Reset password, or just delete
   and re-add the user.
-- Photo uploads go to Firebase Storage and are public URLs (anyone with the
-  link can view the image) — normal for a public club site, just don't
-  upload anything sensitive.
+- Photos are resized/compressed right in the visitor's or your browser and
+  stored as part of the Firestore document itself — there's no separate
+  Storage bucket, no public file URLs, and no Blaze billing plan involved
+  anywhere. The trade-off is Firestore's 1MB-per-document limit, so photos
+  are automatically resized before saving (fine for a club site; not
+  meant for print-quality images).

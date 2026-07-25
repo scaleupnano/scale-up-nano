@@ -1,6 +1,14 @@
 // ==========================================================================
 // Scale Up Nano — Firebase Storage security rules
 //
+// NOTE: as of the latest version of this site, photos are compressed
+// client-side and stored directly inside Firestore documents instead of
+// Firebase Storage — this avoids requiring the paid Blaze plan just to
+// upload a photo. That means these Storage rules are NOT currently
+// needed by the site. This file is kept only in case you want to switch
+// back to real Storage later (e.g. if you upgrade to Blaze for other
+// reasons and want higher-quality, non-resized photos).
+//
 // Paste this into: Firebase Console → Storage → Rules tab → Publish
 //
 // Logic: anyone can view uploaded photos (member photos, memory photos),
