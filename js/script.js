@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
       submitBtn.disabled = true;
       submitBtn.textContent = 'Submitting…';
       try {
-        await db.collection('joinRequests').add(data);
+        await withTimeout(db.collection('joinRequests').add(data), "Submitting");
         joinForm.reset();
         status.textContent = "Thanks, " + data.name.split(' ')[0] + " — we've got your submission and will follow up.";
         status.style.color = 'var(--cyan)';

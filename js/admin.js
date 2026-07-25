@@ -340,6 +340,23 @@ function readFormFieldsEditor(formEl) {
   return fields;
 }
 
+/* If a Firestore/Storage call hangs (bad network, misconfigured rules,
+   blocked connection, etc.) this stops it from freezing the UI forever —
+   after 15s it rejects with a clear message instead. */
+function withTimeout(promise, label) {
+  return Promise.race([
+    promise,
+    new Promise(function (_, reject) {
+      setTimeout(function () {
+        reject(new Error(
+          (label || "This request") + " timed out after 15s. Check your internet connection, " +
+          "that Firebase Storage/Firestore rules were re-published, and the browser console (F12) for a more specific error."
+        ));
+      }, 15000);
+    })
+  ]);
+}
+
 async function submitEntry(collectionKey, schema, formEl) {
   const data = {};
   const fileInputs = [];
@@ -374,14 +391,14 @@ async function submitEntry(collectionKey, schema, formEl) {
     for (const item of fileInputs) {
       const path = collectionKey + "/" + Date.now() + "_" + item.file.name;
       const ref = storage.ref(path);
-      await ref.put(item.file);
-      data[item.key] = await ref.getDownloadURL();
+      await withTimeout(ref.put(item.file), "Photo upload");
+      data[item.key] = await withTimeout(ref.getDownloadURL(), "Fetching photo URL");
     }
 
     if (docId) {
-      await db.collection(collectionKey).doc(docId).update(data);
+      await withTimeout(db.collection(collectionKey).doc(docId).update(data), "Saving");
     } else {
-      await db.collection(collectionKey).add(data);
+      await withTimeout(db.collection(collectionKey).add(data), "Saving");
     }
 
     const panel = document.getElementById("panel-" + collectionKey);
@@ -398,7 +415,7 @@ async function loadEntries(collectionKey, schema) {
   const listEl = document.getElementById("list-" + collectionKey);
   listEl.innerHTML = "<p class='muted'>Loading…</p>";
   try {
-    const snap = await db.collection(collectionKey).orderBy(schema.order || "order").get();
+    const snap = await withTimeout(db.collection(collectionKey).orderBy(schema.order || "order").get(), "Loading");
     if (snap.empty) {
       listEl.innerHTML = "<p class='muted'>Nothing added yet.</p>";
       return;
@@ -443,10 +460,14 @@ async function loadEntries(collectionKey, schema) {
       delBtn.textContent = "Delete";
       delBtn.addEventListener("click", async function () {
         if (!confirm("Delete \"" + title + "\"? This can't be undone.")) return;
-        await db.collection(collectionKey).doc(doc.id).delete();
-        const panel = document.getElementById("panel-" + collectionKey);
-        panel.dataset.loaded = "";
-        renderCollectionPanel(collectionKey, panel);
+        try {
+          await withTimeout(db.collection(collectionKey).doc(doc.id).delete(), "Deleting");
+          const panel = document.getElementById("panel-" + collectionKey);
+          panel.dataset.loaded = "";
+          renderCollectionPanel(collectionKey, panel);
+        } catch (err) {
+          alert("Couldn't delete: " + err.message);
+        }
       });
       actions.appendChild(delBtn);
 
@@ -464,9 +485,15 @@ async function showSubmissions(activityId, activityTitle) {
   modal.style.display = "flex";
   modalBody.innerHTML = "<h2>Submissions — " + escapeHtml(activityTitle) + "</h2><p class='muted'>Loading…</p>";
 
-  const snap = await db.collection("formSubmissions")
-    .where("activityId", "==", activityId)
-    .get();
+  let snap;
+  try {
+    snap = await withTimeout(db.collection("formSubmissions")
+      .where("activityId", "==", activityId)
+      .get(), "Loading");
+  } catch (err) {
+    modalBody.innerHTML = "<h2>Submissions — " + escapeHtml(activityTitle) + "</h2><p class='muted'>Couldn't load: " + escapeHtml(err.message) + "</p>";
+    return;
+  }
 
   if (snap.empty) {
     modalBody.innerHTML = "<h2>Submissions — " + escapeHtml(activityTitle) + "</h2><p class='muted'>No submissions yet.</p>";
@@ -500,7 +527,13 @@ async function renderMemorySubmissions(panel) {
     '<p class="muted">Approve to publish on the public Memories page, or reject to discard.</p></div>' +
     '<div id="mem-sub-list"><p class="muted">Loading…</p></div>';
   const listEl = document.getElementById("mem-sub-list");
-  const snap = await db.collection("memorySubmissions").orderBy("submittedAt", "desc").get();
+  let snap;
+  try {
+    snap = await withTimeout(db.collection("memorySubmissions").orderBy("submittedAt", "desc").get(), "Loading");
+  } catch (err) {
+    listEl.innerHTML = "<p class='muted'>Couldn't load: " + escapeHtml(err.message) + "</p>";
+    return;
+  }
   if (snap.empty) {
     listEl.innerHTML = "<p class='muted'>No submissions yet.</p>";
     return;
@@ -525,13 +558,17 @@ async function renderMemorySubmissions(panel) {
     approveBtn.className = "btn btn-primary btn-small";
     approveBtn.textContent = "Approve → publish";
     approveBtn.addEventListener("click", async function () {
-      await db.collection("memories").add({
-        title: d.title, description: d.description, photoURL: d.photoURL || "",
-        date: "", order: 0
-      });
-      await db.collection("memorySubmissions").doc(doc.id).delete();
-      panel.dataset.loaded = "";
-      renderMemorySubmissions(panel);
+      try {
+        await withTimeout(db.collection("memories").add({
+          title: d.title, description: d.description, photoURL: d.photoURL || "",
+          date: "", order: 0
+        }), "Publishing");
+        await withTimeout(db.collection("memorySubmissions").doc(doc.id).delete(), "Cleaning up");
+        panel.dataset.loaded = "";
+        renderMemorySubmissions(panel);
+      } catch (err) {
+        alert("Couldn't approve: " + err.message);
+      }
     });
     actions.appendChild(approveBtn);
 
@@ -540,9 +577,13 @@ async function renderMemorySubmissions(panel) {
     rejectBtn.textContent = "Reject";
     rejectBtn.addEventListener("click", async function () {
       if (!confirm("Discard this submission?")) return;
-      await db.collection("memorySubmissions").doc(doc.id).delete();
-      panel.dataset.loaded = "";
-      renderMemorySubmissions(panel);
+      try {
+        await withTimeout(db.collection("memorySubmissions").doc(doc.id).delete(), "Deleting");
+        panel.dataset.loaded = "";
+        renderMemorySubmissions(panel);
+      } catch (err) {
+        alert("Couldn't reject: " + err.message);
+      }
     });
     actions.appendChild(rejectBtn);
 
@@ -554,7 +595,13 @@ async function renderMemorySubmissions(panel) {
 async function renderJoinRequests(panel) {
   panel.innerHTML = '<div class="panel-head"><h2>Join requests</h2></div><div id="join-list"><p class="muted">Loading…</p></div>';
   const listEl = document.getElementById("join-list");
-  const snap = await db.collection("joinRequests").orderBy("submittedAt", "desc").get();
+  let snap;
+  try {
+    snap = await withTimeout(db.collection("joinRequests").orderBy("submittedAt", "desc").get(), "Loading");
+  } catch (err) {
+    listEl.innerHTML = "<p class='muted'>Couldn't load: " + escapeHtml(err.message) + "</p>";
+    return;
+  }
   if (snap.empty) {
     listEl.innerHTML = "<p class='muted'>No submissions yet.</p>";
     return;

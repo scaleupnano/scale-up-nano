@@ -8,6 +8,23 @@
    instead of a blank page.
    ========================================================================== */
 
+/* If a Firestore/Storage call hangs (bad network, misconfigured rules,
+   blocked connection, etc.) this stops it from freezing the UI forever —
+   after 15s it rejects with a clear message instead. */
+function withTimeout(promise, label) {
+  return Promise.race([
+    promise,
+    new Promise(function (_, reject) {
+      setTimeout(function () {
+        reject(new Error(
+          (label || "This request") + " timed out after 15s. Check your internet connection, " +
+          "that Firebase Storage/Firestore rules were re-published, and the browser console (F12) for a more specific error."
+        ));
+      }, 15000);
+    })
+  ]);
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   document.querySelectorAll("[data-render]").forEach(function (container) {
     const kind = container.dataset.render;
@@ -234,13 +251,13 @@ const RENDERERS = {
         let photoURL = "";
         if (file) {
           const ref = storage.ref("memory-submissions/" + Date.now() + "_" + file.name);
-          await ref.put(file);
-          photoURL = await ref.getDownloadURL();
+          await withTimeout(ref.put(file), "Photo upload");
+          photoURL = await withTimeout(ref.getDownloadURL(), "Fetching photo URL");
         }
-        await db.collection("memorySubmissions").add({
+        await withTimeout(db.collection("memorySubmissions").add({
           name: name, title: title, description: desc, photoURL: photoURL,
           status: "pending", submittedAt: Date.now()
-        });
+        }), "Submitting");
         e.target.innerHTML = "<p class='form-status'>Thanks — your memory is in for review and will appear once approved.</p>";
       } catch (err) {
         status.textContent = "Couldn't submit: " + err.message;
@@ -318,8 +335,8 @@ function buildActivityForm(eventId, formFields) {
           const file = fileInput.files[0];
           if (file) {
             const ref = storage.ref("form-uploads/" + eventId + "/" + Date.now() + "_" + file.name);
-            await ref.put(file);
-            answers[f.label] = await ref.getDownloadURL();
+            await withTimeout(ref.put(file), "Photo upload");
+            answers[f.label] = await withTimeout(ref.getDownloadURL(), "Fetching photo URL");
           } else {
             answers[f.label] = "";
           }
@@ -327,11 +344,11 @@ function buildActivityForm(eventId, formFields) {
           answers[f.label] = wrap.querySelector('[name="' + f.id + '"]').value;
         }
       }
-      await db.collection("formSubmissions").add({
+      await withTimeout(db.collection("formSubmissions").add({
         activityId: eventId,
         answers: answers,
         submittedAt: Date.now()
-      });
+      }), "Submitting");
       wrap.innerHTML = "<p class='form-status'>Thanks — your response was recorded.</p>";
     } catch (err) {
       status.textContent = "Couldn't submit: " + err.message;
