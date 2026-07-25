@@ -7,7 +7,7 @@ without touching GitHub for routine updates.
 
 ## What's in this version
 
-- **Public site**: Home, Activities, Projects, Members, Opportunities,
+- **Public site**: Home, Events, Projects, Members, Opportunities,
   Links, Memories, Join — all pulling live content from Firestore.
 - **`admin.html`**: a password-protected dashboard where you add/edit/delete
   everything, upload photos, set an activity's status (Upcoming / Done /
@@ -103,25 +103,33 @@ Settings → Pages should already be correctly configured from last time
 
 1. Visit `https://scaleupnano.github.io/scale-up-nano/admin.html`
 2. Sign in with the email/password you created in Part 1, step 6
-3. Use the tabs across the top: **Members, Projects, Activities,
-   Opportunities, Links, Memories, Join requests**
+3. Use the tabs across the top: **Members, Projects, Events & formulas,
+   Opportunities, Links, Memories, Memory submissions, Join requests**
 
 For each of the first six tabs: fill out the form at the top to add a new
 entry (photos upload directly — just pick a file), and existing entries
 list below with **Edit** and **Delete** buttons.
 
-### Activities — status and forms
-- Every activity has a **Status** dropdown (Upcoming / Done / Delayed /
-  Cancelled) — change it any time and the public Activities page updates
-  immediately, badge and all.
-- Below the normal fields, there's a **"Sign-up / feedback form"** builder —
-  click **+ Add question**, type a label (e.g. "Will you attend?"), pick a
-  type (text / textarea / number / email / select), repeat for as many
-  questions as you want. Leave it empty if this activity doesn't need a form.
-- Once saved, that form appears live on the public Activities page under
-  that activity's card. Visitors fill it in and submit.
-- Back in admin, click **View submissions** on that activity to see every
-  response — this is not visible anywhere on the public site.
+### Events — track, status, and the formula (form) builder
+- **Track** is a fixed picker — Science / Robotics / Code / Health — click
+  one to select it.
+- **Status** is also a picker — Scheduled / Delayed / Event ended.
+  This single field controls the sign-up form automatically:
+  - **Scheduled** → the form is live and visitors can fill it in
+  - **Delayed** → the form hides and a small **yellow dot** appears before
+    the event's name in both admin and the public page
+  - **Event ended** → the form hides and a small **red dot** appears
+    before the name instead
+- Below the normal fields is the **"Formula"** builder — three buttons let
+  you add a **Text question**, a **Multiple choice** question (type each
+  choice into its own box, click **+ add option** for more), or a
+  **Photo upload** question. Each question has its own **required**
+  checkbox and a 🗑 to remove it.
+- Once saved, that form appears live on the public Events page under that
+  event's card — but only while its status is Scheduled.
+- Back in admin, click **View submissions** on that event to see every
+  response, including a **"View file →"** link for any photo-upload
+  answers — none of this is visible anywhere on the public site.
 
 ### Join requests
 Anyone who submits the Join page's form shows up here — name, email,

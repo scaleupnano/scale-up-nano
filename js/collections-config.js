@@ -7,6 +7,13 @@
    admin form and can be rendered on the public side too.
    ========================================================================== */
 
+const TRACK_OPTIONS = [
+  { value: "Science", icon: "🧪" },
+  { value: "Robotics", icon: "🤖" },
+  { value: "Code", icon: "💻" },
+  { value: "Health", icon: "❤️" }
+];
+
 const COLLECTIONS = {
 
   members: {
@@ -34,19 +41,23 @@ const COLLECTIONS = {
     ]
   },
 
-  activities: {
-    label: "Activities",
+  events: {
+    label: "Events & formulas",
     order: "order",
     hasForm: true,
     fields: [
-      { key: "tag",   label: "Track", type: "text" },
-      { key: "title", label: "Title", type: "text", required: true },
-      { key: "description", label: "Description", type: "textarea" },
-      { key: "date",  label: "Date (DD/MM)", type: "text" },
-      { key: "time",  label: "Time (HH:MM)", type: "text" },
-      { key: "location", label: "Room / Hall", type: "text" },
-      { key: "status", label: "Status", type: "select",
-        options: ["Upcoming", "Done", "Delayed", "Cancelled"], default: "Upcoming" },
+      { key: "tag",   label: "Track", type: "pills", options: TRACK_OPTIONS, required: true },
+      { key: "title", label: "Event title", type: "text", required: true, placeholder: "e.g. Building Our First Nanobot Model" },
+      { key: "description", label: "What's it about", type: "textarea", placeholder: "Why members should show up" },
+      { key: "date",  label: "Date", type: "date" },
+      { key: "time",  label: "Time", type: "time" },
+      { key: "location", label: "Location", type: "text", placeholder: "Room / hall" },
+      { key: "status", label: "Status", type: "pills",
+        options: [
+          { value: "Scheduled", icon: "" },
+          { value: "Delayed", icon: "" },
+          { value: "Event ended", icon: "" }
+        ], default: "Scheduled" },
       { key: "order", label: "Display order", type: "number", default: 0 }
     ]
   },
@@ -87,7 +98,11 @@ const COLLECTIONS = {
   }
 };
 
-/* Field types used when building a custom form for an activity
-   (attached to the activity doc as `formFields`, answered by visitors
-   on the public activities page, results readable only from admin.html). */
-const FORM_FIELD_TYPES = ["text", "textarea", "number", "email", "select"];
+/* Question types for an event's sign-up/feedback form. Each has a short
+   badge shown next to the question in admin, and a button label used to
+   add one. */
+const FORM_FIELD_TYPES = {
+  text: { badge: "TEXT", addLabel: "+ Text question" },
+  multiple_choice: { badge: "CHOICE", addLabel: "+ Multiple choice" },
+  file: { badge: "FILE", addLabel: "+ Photo upload" }
+};

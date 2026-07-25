@@ -43,11 +43,11 @@ els.logoutBtn.addEventListener("click", function () {
 });
 
 /* ---------- Tab scaffolding ---------- */
-const TAB_ORDER = ["members", "projects", "activities", "opportunities", "links", "memories", "memorySubmissions", "joinRequests"];
+const TAB_ORDER = ["members", "projects", "events", "opportunities", "links", "memories", "memorySubmissions", "joinRequests"];
 const TAB_LABELS = {
   members: "Members",
   projects: "Projects",
-  activities: "Activities",
+  events: "Events",
   opportunities: "Opportunities",
   links: "Links",
   memories: "Memories",
@@ -123,6 +123,7 @@ function buildEntryForm(collectionKey, schema, formEl, existing, docId) {
     if (field.type === "textarea") {
       input = document.createElement("textarea");
       input.rows = 3;
+      if (field.placeholder) input.placeholder = field.placeholder;
     } else if (field.type === "select") {
       input = document.createElement("select");
       field.options.forEach(function (opt) {
@@ -130,19 +131,39 @@ function buildEntryForm(collectionKey, schema, formEl, existing, docId) {
         o.value = opt; o.textContent = opt;
         input.appendChild(o);
       });
+    } else if (field.type === "pills") {
+      input = buildPillPicker(field, existing);
     } else if (field.type === "image") {
       input = document.createElement("input");
       input.type = "file";
       input.accept = "image/*";
+    } else if (field.type === "checkbox") {
+      input = document.createElement("input");
+      input.type = "checkbox";
+      input.style.width = "auto";
+    } else if (field.type === "datetime") {
+      input = document.createElement("input");
+      input.type = "datetime-local";
+    } else if (field.type === "date") {
+      input = document.createElement("input");
+      input.type = "date";
+    } else if (field.type === "time") {
+      input = document.createElement("input");
+      input.type = "time";
     } else {
       input = document.createElement("input");
       input.type = field.type === "number" ? "number" : "text";
+      if (field.placeholder) input.placeholder = field.placeholder;
     }
     input.name = field.key;
     input.dataset.type = field.type;
-    if (field.required) input.required = true;
+    if (field.required && field.type !== "pills") input.required = true;
 
-    if (existing && field.type !== "image") {
+    if (field.type === "pills") {
+      // value handling lives inside buildPillPicker via a hidden input
+    } else if (existing && field.type === "checkbox") {
+      input.checked = !!existing[field.key];
+    } else if (existing && field.type !== "image") {
       input.value = existing[field.key] != null ? existing[field.key] : (field.default || "");
     } else if (!existing && field.type !== "image" && field.default !== undefined) {
       input.value = field.default;
@@ -155,6 +176,20 @@ function buildEntryForm(collectionKey, schema, formEl, existing, docId) {
       preview.src = existing[field.key];
       preview.className = "current-photo";
       wrap.appendChild(preview);
+
+      const removeBtn = document.createElement("button");
+      removeBtn.type = "button";
+      removeBtn.className = "btn btn-ghost btn-small danger";
+      removeBtn.textContent = "Remove photo";
+      removeBtn.style.marginTop = "8px";
+      removeBtn.style.display = "block";
+      removeBtn.addEventListener("click", async function () {
+        if (!confirm("Remove this photo? Save the form after to make it permanent.")) return;
+        preview.remove();
+        removeBtn.remove();
+        formEl.dataset["clear_" + field.key] = "1";
+      });
+      wrap.appendChild(removeBtn);
     }
 
     formEl.appendChild(wrap);
@@ -190,34 +225,96 @@ function buildEntryForm(collectionKey, schema, formEl, existing, docId) {
   };
 }
 
+function buildPillPicker(field, existing) {
+  const wrap = document.createElement("div");
+  wrap.className = "pill-picker";
+  const hidden = document.createElement("input");
+  hidden.type = "hidden";
+  hidden.name = field.key;
+  const current = (existing && existing[field.key]) || field.default || (field.options[0] && field.options[0].value) || "";
+  hidden.value = current;
+
+  field.options.forEach(function (opt) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "pill-option" + (opt.value === current ? " active" : "");
+    btn.textContent = (opt.icon ? opt.icon + " " : "") + opt.value;
+    btn.addEventListener("click", function () {
+      hidden.value = opt.value;
+      wrap.querySelectorAll(".pill-option").forEach(function (b) { b.classList.remove("active"); });
+      btn.classList.add("active");
+    });
+    wrap.appendChild(btn);
+  });
+
+  wrap.appendChild(hidden);
+  return wrap;
+}
+
 function buildFormFieldsEditor(existing) {
   const box = document.createElement("div");
   box.className = "form-fields-editor";
-  box.innerHTML = '<label>Sign-up / feedback form for this activity (optional)</label>' +
+  box.innerHTML = '<label>Formula (the form participants fill)</label>' +
     '<div class="ff-rows" id="ff-rows"></div>' +
-    '<button type="button" class="btn btn-ghost btn-small" id="ff-add">+ Add question</button>';
+    '<div class="ff-add-row">' +
+      '<button type="button" class="btn btn-ghost btn-small" data-add-type="text">' + FORM_FIELD_TYPES.text.addLabel + '</button>' +
+      '<button type="button" class="btn btn-ghost btn-small" data-add-type="multiple_choice">' + FORM_FIELD_TYPES.multiple_choice.addLabel + '</button>' +
+      '<button type="button" class="btn btn-ghost btn-small" data-add-type="file">' + FORM_FIELD_TYPES.file.addLabel + '</button>' +
+    '</div>';
 
   const rows = box.querySelector("#ff-rows");
   const existingFields = (existing && existing.formFields) || [];
 
   function addRow(field) {
+    const type = field ? field.type : "text";
     const row = document.createElement("div");
     row.className = "ff-row";
-    row.innerHTML =
+    row.dataset.type = type;
+
+    const header = document.createElement("div");
+    header.className = "ff-row-header";
+    header.innerHTML =
       '<input type="text" class="ff-label" placeholder="Question label" value="' +
         (field ? field.label.replace(/"/g, "&quot;") : "") + '">' +
-      '<select class="ff-type">' +
-        FORM_FIELD_TYPES.map(function (t) {
-          return '<option value="' + t + '"' + (field && field.type === t ? " selected" : "") + '>' + t + '</option>';
-        }).join("") +
-      '</select>' +
-      '<button type="button" class="btn btn-ghost btn-small ff-remove">Remove</button>';
-    row.querySelector(".ff-remove").addEventListener("click", function () { row.remove(); });
+      '<span class="ff-badge">' + FORM_FIELD_TYPES[type].badge + '</span>' +
+      '<label class="ff-required"><input type="checkbox" class="ff-required-box"' + (field && field.required ? " checked" : "") + '> required</label>' +
+      '<button type="button" class="btn btn-ghost btn-small ff-remove">🗑</button>';
+    row.appendChild(header);
+    header.querySelector(".ff-remove").addEventListener("click", function () { row.remove(); });
+
+    if (type === "multiple_choice") {
+      const optionsBox = document.createElement("div");
+      optionsBox.className = "ff-options-box";
+      row.appendChild(optionsBox);
+
+      function addOption(value) {
+        const optRow = document.createElement("div");
+        optRow.className = "ff-option-row";
+        optRow.innerHTML =
+          '<input type="text" class="ff-option-input" placeholder="Option" value="' + (value ? value.replace(/"/g, "&quot;") : "") + '">' +
+          '<button type="button" class="ff-option-remove">✕</button>';
+        optRow.querySelector(".ff-option-remove").addEventListener("click", function () { optRow.remove(); });
+        optionsBox.appendChild(optRow);
+      }
+
+      const existingOptions = (field && field.options) || [""];
+      existingOptions.forEach(addOption);
+
+      const addOptBtn = document.createElement("button");
+      addOptBtn.type = "button";
+      addOptBtn.className = "ff-add-option";
+      addOptBtn.textContent = "+ add option";
+      addOptBtn.addEventListener("click", function () { addOption(""); });
+      row.appendChild(addOptBtn);
+    }
+
     rows.appendChild(row);
   }
 
   existingFields.forEach(addRow);
-  box.querySelector("#ff-add").addEventListener("click", function () { addRow(); });
+  box.querySelectorAll("[data-add-type]").forEach(function (btn) {
+    btn.addEventListener("click", function () { addRow({ type: btn.dataset.addType, label: "" }); });
+  });
   box.dataset.role = "formFieldsEditor";
   return box;
 }
@@ -229,8 +326,16 @@ function readFormFieldsEditor(formEl) {
   const fields = [];
   rows.forEach(function (row, i) {
     const label = row.querySelector(".ff-label").value.trim();
-    const type = row.querySelector(".ff-type").value;
-    if (label) fields.push({ id: "q" + i, label: label, type: type });
+    if (!label) return;
+    const type = row.dataset.type;
+    const required = row.querySelector(".ff-required-box").checked;
+    const field = { id: "q" + i, label: label, type: type, required: required };
+    if (type === "multiple_choice") {
+      field.options = Array.from(row.querySelectorAll(".ff-option-input"))
+        .map(function (inp) { return inp.value.trim(); })
+        .filter(Boolean);
+    }
+    fields.push(field);
   });
   return fields;
 }
@@ -242,9 +347,15 @@ async function submitEntry(collectionKey, schema, formEl) {
   schema.fields.forEach(function (field) {
     const input = formEl.querySelector('[name="' + field.key + '"]');
     if (field.type === "image") {
-      if (input.files && input.files[0]) fileInputs.push({ key: field.key, file: input.files[0] });
+      if (input.files && input.files[0]) {
+        fileInputs.push({ key: field.key, file: input.files[0] });
+      } else if (formEl.dataset["clear_" + field.key]) {
+        data[field.key] = "";
+      }
     } else if (field.type === "number") {
       data[field.key] = Number(input.value) || 0;
+    } else if (field.type === "checkbox") {
+      data[field.key] = input.checked;
     } else {
       data[field.key] = input.value;
     }
@@ -299,8 +410,11 @@ async function loadEntries(collectionKey, schema) {
       row.className = "entry-row";
 
       const title = data.title || data.name || data.label || "(untitled)";
+      const dot = data.status === "Scheduled" ? '<span class="status-dot dot-scheduled"></span>' :
+                  data.status === "Delayed" ? '<span class="status-dot dot-delayed"></span>' :
+                  data.status === "Event ended" ? '<span class="status-dot dot-ended"></span>' : '';
       row.innerHTML =
-        '<div class="entry-info"><strong>' + escapeHtml(title) + '</strong>' +
+        '<div class="entry-info">' + dot + '<strong>' + escapeHtml(title) + '</strong>' +
         (data.status ? ' <span class="status-badge status-' + slug(data.status) + '">' + escapeHtml(data.status) + '</span>' : '') +
         '</div><div class="entry-actions"></div>';
 
@@ -363,7 +477,11 @@ async function showSubmissions(activityId, activityTitle) {
   snap.forEach(function (doc) {
     const d = doc.data();
     const answerLines = Object.keys(d.answers || {}).map(function (k) {
-      return "<div><strong>" + escapeHtml(k) + ":</strong> " + escapeHtml(String(d.answers[k])) + "</div>";
+      const val = String(d.answers[k]);
+      const display = /^https?:\/\//.test(val)
+        ? '<a href="' + val + '" target="_blank" rel="noopener" style="color:var(--cyan);">View file →</a>'
+        : escapeHtml(val);
+      return "<div><strong>" + escapeHtml(k) + ":</strong> " + display + "</div>";
     }).join("");
     rows += '<div class="submission-card">' + answerLines +
       '<div class="muted small">' + (d.submittedAt ? new Date(d.submittedAt).toLocaleString() : "") + '</div></div>';

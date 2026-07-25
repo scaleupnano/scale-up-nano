@@ -2,7 +2,7 @@
    Scale Up Nano — public page rendering
 
    Each public page has a container with a data-render attribute
-   (e.g. data-render="activities"). On load, this script fetches the
+   (e.g. data-render="events"). On load, this script fetches the
    matching Firestore collection and renders cards into it. If Firestore
    has nothing yet (or fails to load), a friendly empty-state is shown
    instead of a blank page.
@@ -17,11 +17,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
 const RENDERERS = {
 
-  activities: async function (container) {
+  events: async function (container) {
     container.innerHTML = "<p class='muted'>Loading…</p>";
-    const snap = await safeGet("activities");
+    const snap = await safeGet("events");
     if (!snap || snap.empty) {
-      container.innerHTML = emptyState("No activities posted yet — check back soon.");
+      container.innerHTML = emptyState("No events posted yet — check back soon.");
       return;
     }
     container.innerHTML = "";
@@ -29,10 +29,13 @@ const RENDERERS = {
       const d = doc.data();
       const card = document.createElement("div");
       card.className = "card";
+      const dot = d.status === "Scheduled" ? '<span class="status-dot dot-scheduled"></span>' :
+                  d.status === "Delayed" ? '<span class="status-dot dot-delayed"></span>' :
+                  d.status === "Event ended" ? '<span class="status-dot dot-ended"></span>' : '';
       card.innerHTML =
         (d.tag ? '<span class="tag">' + escapeHtml(d.tag) + '</span>' : '') +
         (d.status ? ' <span class="status-badge status-' + slug(d.status) + '">' + escapeHtml(d.status) + '</span>' : '') +
-        '<h3>' + escapeHtml(d.title || "") + '</h3>' +
+        '<h3>' + dot + escapeHtml(d.title || "") + '</h3>' +
         '<p>' + escapeHtml(d.description || "") + '</p>' +
         '<div class="meta">' +
           (d.date ? '<span>📅 ' + escapeHtml(d.date) + '</span>' : '') +
@@ -41,7 +44,21 @@ const RENDERERS = {
         '</div>';
 
       if (Array.isArray(d.formFields) && d.formFields.length) {
-        card.appendChild(buildActivityForm(doc.id, d.formFields));
+        if (d.status === "Scheduled") {
+          card.appendChild(buildActivityForm(doc.id, d.formFields));
+        } else if (d.status === "Delayed") {
+          const note = document.createElement("p");
+          note.className = "form-status muted small";
+          note.style.marginTop = "14px";
+          note.textContent = "This event was delayed — the form will reopen once it's rescheduled.";
+          card.appendChild(note);
+        } else if (d.status === "Event ended") {
+          const note = document.createElement("p");
+          note.className = "form-status muted small";
+          note.style.marginTop = "14px";
+          note.textContent = "This event has ended — the form is now closed.";
+          card.appendChild(note);
+        }
       }
 
       container.appendChild(card);
@@ -137,19 +154,19 @@ const RENDERERS = {
   },
 
   stats: async function (container) {
-    const [members, activities, projects] = await Promise.all([
-      safeCount("members"), safeCount("activities"), safeCount("projects")
+    const [members, events, projects] = await Promise.all([
+      safeCount("members"), safeCount("events"), safeCount("projects")
     ]);
     const nums = container.querySelectorAll("[data-stat]");
     nums.forEach(function (el) {
       const key = el.dataset.stat;
-      const val = key === "members" ? members : key === "activities" ? activities : projects;
+      const val = key === "members" ? members : key === "events" ? events : projects;
       el.textContent = val;
     });
   },
 
   nextEvent: async function (container) {
-    const snap = await safeGet("activities");
+    const snap = await safeGet("events");
     if (!snap || snap.empty) {
       container.innerHTML = emptyState("No upcoming session posted yet — check the Activities page.");
       return;
@@ -234,8 +251,8 @@ const RENDERERS = {
   }
 };
 
-/* ---------- Per-activity sign-up / feedback form ---------- */
-function buildActivityForm(activityId, formFields) {
+/* ---------- Per-event sign-up / feedback form ---------- */
+function buildActivityForm(eventId, formFields) {
   const wrap = document.createElement("form");
   wrap.className = "activity-form";
   wrap.innerHTML = "<div class='form-divider'></div>";
@@ -247,17 +264,32 @@ function buildActivityForm(activityId, formFields) {
     label.textContent = f.label;
     row.appendChild(label);
 
-    let input;
-    if (f.type === "textarea") {
-      input = document.createElement("textarea");
-      input.rows = 2;
+    if (f.type === "multiple_choice") {
+      const optWrap = document.createElement("div");
+      optWrap.className = "choice-group";
+      (f.options || []).forEach(function (opt, i) {
+        const optLabel = document.createElement("label");
+        optLabel.className = "choice-option";
+        optLabel.innerHTML =
+          '<input type="radio" name="' + f.id + '" value="' + escapeHtml(opt) + '"' + (f.required ? " required" : "") + '> ' + escapeHtml(opt);
+        optWrap.appendChild(optLabel);
+      });
+      row.appendChild(optWrap);
+    } else if (f.type === "file") {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.name = f.id;
+      input.dataset.fieldType = "file";
+      if (f.required) input.required = true;
+      row.appendChild(input);
     } else {
-      input = document.createElement("input");
-      input.type = f.type === "number" ? "number" : (f.type === "email" ? "email" : "text");
+      const input = document.createElement("input");
+      input.type = "text";
+      input.name = f.id;
+      if (f.required) input.required = true;
+      row.appendChild(input);
     }
-    input.name = f.id;
-    input.required = true;
-    row.appendChild(input);
+
     wrap.appendChild(row);
   });
 
@@ -273,15 +305,30 @@ function buildActivityForm(activityId, formFields) {
 
   wrap.addEventListener("submit", async function (e) {
     e.preventDefault();
-    const answers = {};
-    formFields.forEach(function (f) {
-      answers[f.label] = wrap.querySelector('[name="' + f.id + '"]').value;
-    });
     submitBtn.disabled = true;
     submitBtn.textContent = "Submitting…";
     try {
+      const answers = {};
+      for (const f of formFields) {
+        if (f.type === "multiple_choice") {
+          const checked = wrap.querySelector('input[name="' + f.id + '"]:checked');
+          answers[f.label] = checked ? checked.value : "";
+        } else if (f.type === "file") {
+          const fileInput = wrap.querySelector('[name="' + f.id + '"]');
+          const file = fileInput.files[0];
+          if (file) {
+            const ref = storage.ref("form-uploads/" + eventId + "/" + Date.now() + "_" + file.name);
+            await ref.put(file);
+            answers[f.label] = await ref.getDownloadURL();
+          } else {
+            answers[f.label] = "";
+          }
+        } else {
+          answers[f.label] = wrap.querySelector('[name="' + f.id + '"]').value;
+        }
+      }
       await db.collection("formSubmissions").add({
-        activityId: activityId,
+        activityId: eventId,
         answers: answers,
         submittedAt: Date.now()
       });

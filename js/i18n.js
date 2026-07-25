@@ -15,7 +15,7 @@
 const I18N = {
   en: {
     dir: "ltr",
-    nav: { home: "Home", activities: "Activities", projects: "Projects", members: "Members",
+    nav: { home: "Home", events: "Events", projects: "Projects", members: "Members",
            opportunities: "Opportunities", links: "Links", memories: "Memories", join: "Join" },
     footer: { fine: "SCALE UP NANO · SCHOOL SCIENTIFIC CLUB · NSNN" },
     home: {
@@ -24,7 +24,7 @@ const I18N = {
       lead: "Scale Up Nano is a student-run community exploring nanoscience, robotics, code, and health — built by students, for students who want to build something real before graduation.",
       cta1: "Join the club →", cta2: "See what we're building"
     },
-    activities: { eyebrow: "Activities", title: "Sessions & workshops",
+    events: { eyebrow: "Events", title: "Sessions & workshops",
       lead: "Weekly meetups covering all four labs — talks, hands-on builds, and open lab hours where members work on their own projects side by side." },
     projects: { eyebrow: "Projects", title: "What we're building",
       lead: "Member-led projects across all four labs — some solo, some team builds carried across terms." },
@@ -41,7 +41,7 @@ const I18N = {
 
   fr: {
     dir: "ltr",
-    nav: { home: "Accueil", activities: "Activités", projects: "Projets", members: "Membres",
+    nav: { home: "Accueil", events: "Événements", projects: "Projets", members: "Membres",
            opportunities: "Opportunités", links: "Liens", memories: "Souvenirs", join: "Rejoindre" },
     footer: { fine: "SCALE UP NANO · CLUB SCIENTIFIQUE SCOLAIRE · NSNN" },
     home: {
@@ -50,7 +50,7 @@ const I18N = {
       lead: "Scale Up Nano est une communauté étudiante qui explore la nanoscience, la robotique, le code et la santé — créée par des étudiants, pour des étudiants qui veulent construire quelque chose de concret avant la fin de leurs études.",
       cta1: "Rejoindre le club →", cta2: "Voir ce que nous construisons"
     },
-    activities: { eyebrow: "Activités", title: "Séances et ateliers",
+    events: { eyebrow: "Événements", title: "Séances et ateliers",
       lead: "Des rencontres hebdomadaires couvrant les quatre pôles — conférences, ateliers pratiques, et heures de labo ouvert où chacun avance sur son propre projet." },
     projects: { eyebrow: "Projets", title: "Ce que nous construisons",
       lead: "Des projets menés par les membres dans les quatre pôles — certains en solo, d'autres en équipe sur plusieurs trimestres." },
@@ -67,7 +67,7 @@ const I18N = {
 
   ar: {
     dir: "rtl",
-    nav: { home: "الرئيسية", activities: "الأنشطة", projects: "المشاريع", members: "الأعضاء",
+    nav: { home: "الرئيسية", events: "الفعاليات", projects: "المشاريع", members: "الأعضاء",
            opportunities: "الفرص", links: "الروابط", memories: "الذكريات", join: "انضم" },
     footer: { fine: "سكيل أب نانو · نادٍ علمي مدرسي · NSNN" },
     home: {
@@ -76,7 +76,7 @@ const I18N = {
       lead: "سكيل أب نانو مجتمع طلابي يستكشف علم النانو والروبوتات والبرمجة والصحة — أسّسه طلاب من أجل طلاب يريدون بناء شيء حقيقي قبل التخرج.",
       cta1: "انضم إلى النادي ←", cta2: "شاهد ما نبنيه"
     },
-    activities: { eyebrow: "الأنشطة", title: "الجلسات وورش العمل",
+    events: { eyebrow: "الفعاليات", title: "الجلسات وورش العمل",
       lead: "لقاءات أسبوعية تغطي المسارات الأربعة — محاضرات قصيرة، بناء عملي، وساعات مختبر مفتوحة يعمل فيها الأعضاء على مشاريعهم الخاصة." },
     projects: { eyebrow: "المشاريع", title: "ما الذي نبنيه",
       lead: "مشاريع يقودها الأعضاء عبر المسارات الأربعة — بعضها فردي وبعضها جماعي يمتد عبر فصول دراسية." },
