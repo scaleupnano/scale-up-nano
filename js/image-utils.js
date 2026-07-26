@@ -39,3 +39,37 @@ function compressImageToDataURL(file, maxDim, quality) {
     reader.readAsDataURL(file);
   });
 }
+
+/* PNG (lossless) version — used for QR codes, logos, or anything with
+   sharp edges/text where JPEG compression artifacts would hurt legibility
+   or scannability. Larger file size than compressImageToDataURL, so the
+   max dimension default is kept modest to stay well under Firestore's
+   1MB document limit. */
+function imageToPngDataURL(file, maxDim) {
+  maxDim = maxDim || 700;
+  return new Promise(function (resolve, reject) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const img = new Image();
+      img.onload = function () {
+        let w = img.width, h = img.height;
+        if (w > maxDim || h > maxDim) {
+          if (w >= h) { h = Math.round(h * (maxDim / w)); w = maxDim; }
+          else { w = Math.round(w * (maxDim / h)); h = maxDim; }
+        }
+        const canvas = document.createElement("canvas");
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext("2d");
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, w, h);
+        ctx.drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL("image/png"));
+      };
+      img.onerror = function () { reject(new Error("Couldn't read that image file.")); };
+      img.src = e.target.result;
+    };
+    reader.onerror = function () { reject(new Error("Couldn't read that file.")); };
+    reader.readAsDataURL(file);
+  });
+}

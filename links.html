@@ -51,8 +51,9 @@
 <section class="section" style="padding-top:0;">
   <div class="links-list" data-render="links"></div>
 
-  <div class="slot" style="max-width:200px; margin:36px auto 0; height:200px; display:flex; align-items:center; justify-content:center;">
-    [ QR code ]
+  <div style="text-align:center; margin-top:36px;">
+    <div class="eyebrow" data-i18n="links.scan" style="margin-bottom:14px; display:inline-flex;">Scan to follow</div>
+    <div data-render="qrCode"></div>
   </div>
 </section>
 
@@ -74,6 +75,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="js/firebase-init.js"></script>
+<script src="js/qr-default.js"></script>
 <script src="js/image-utils.js"></script>
 <script src="js/collections-config.js"></script>
 <script src="js/render-public.js"></script>

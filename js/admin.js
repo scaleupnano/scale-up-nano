@@ -43,13 +43,14 @@ els.logoutBtn.addEventListener("click", function () {
 });
 
 /* ---------- Tab scaffolding ---------- */
-const TAB_ORDER = ["members", "projects", "events", "opportunities", "links", "memories", "memorySubmissions", "joinRequests"];
+const TAB_ORDER = ["members", "projects", "events", "opportunities", "links", "qrCode", "memories", "memorySubmissions", "joinRequests"];
 const TAB_LABELS = {
   members: "Members",
   projects: "Projects",
   events: "Events",
   opportunities: "Opportunities",
   links: "Links",
+  qrCode: "QR Code",
   memories: "Memories",
   memorySubmissions: "Memory submissions",
   joinRequests: "Join requests"
@@ -89,6 +90,8 @@ function switchTab(key) {
     renderJoinRequests(panel);
   } else if (key === "memorySubmissions") {
     renderMemorySubmissions(panel);
+  } else if (key === "qrCode") {
+    renderQrCodePanel(panel);
   } else {
     renderCollectionPanel(key, panel);
   }
@@ -587,6 +590,64 @@ async function renderMemorySubmissions(panel) {
     actions.appendChild(rejectBtn);
 
     listEl.appendChild(row);
+  });
+}
+
+/* ---------- QR Code (single site-wide setting, not a list) ---------- */
+async function renderQrCodePanel(panel) {
+  panel.innerHTML =
+    '<div class="panel-head"><h2>QR Code</h2>' +
+    '<p class="muted">Shown on the public Links page under "Scan to follow". Upload a new image any time to replace it.</p></div>' +
+    '<div id="qr-current" style="margin-bottom:20px;"><p class="muted">Loading…</p></div>' +
+    '<form id="qr-form" class="entry-form">' +
+      '<div class="field-row"><label>New QR code image</label><input type="file" id="qr-file" accept="image/*"></div>' +
+      '<div class="form-actions">' +
+        '<button type="submit" class="btn btn-primary">Save QR code</button>' +
+        '<button type="button" id="qr-reset" class="btn btn-ghost">Reset to default</button>' +
+      '</div>' +
+    '</form>';
+
+  const currentBox = document.getElementById("qr-current");
+  let docSnap;
+  try {
+    docSnap = await withTimeout(db.collection("settings").doc("links").get(), "Loading");
+  } catch (err) {
+    currentBox.innerHTML = "<p class='muted'>Couldn't load: " + escapeHtml(err.message) + "</p>";
+    return;
+  }
+  const data = (docSnap && docSnap.exists && docSnap.data()) || {};
+  const currentImg = data.qrCodeImage || DEFAULT_QR_IMAGE;
+  currentBox.innerHTML =
+    '<img src="' + currentImg + '" style="width:160px; height:160px; border-radius:10px; border:1px solid var(--line); object-fit:contain; background:#fff; padding:8px;">' +
+    (data.qrCodeImage ? '<p class="muted small" style="margin-top:8px;">Custom image set.</p>' : '<p class="muted small" style="margin-top:8px;">Using the default image — upload your own to replace it.</p>');
+
+  document.getElementById("qr-form").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    const fileInput = document.getElementById("qr-file");
+    const file = fileInput.files[0];
+    if (!file) { alert("Choose an image first."); return; }
+    const btn = e.target.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    btn.textContent = "Saving…";
+    try {
+      const dataUrl = await imageToPngDataURL(file, 700);
+      await withTimeout(db.collection("settings").doc("links").set({ qrCodeImage: dataUrl }, { merge: true }), "Saving");
+      renderQrCodePanel(panel);
+    } catch (err) {
+      alert("Couldn't save: " + err.message);
+      btn.disabled = false;
+      btn.textContent = "Save QR code";
+    }
+  });
+
+  document.getElementById("qr-reset").addEventListener("click", async function () {
+    if (!confirm("Reset to the default QR code image?")) return;
+    try {
+      await withTimeout(db.collection("settings").doc("links").set({ qrCodeImage: "" }, { merge: true }), "Saving");
+      renderQrCodePanel(panel);
+    } catch (err) {
+      alert("Couldn't reset: " + err.message);
+    }
   });
 }
 

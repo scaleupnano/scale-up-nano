@@ -35,10 +35,10 @@ document.addEventListener("DOMContentLoaded", function () {
 const RENDERERS = {
 
   events: async function (container) {
-    container.innerHTML = "<p class='muted'>Loading…</p>";
+    container.innerHTML = "<p class='muted'>" + t('common.loading','Loading…') + "</p>";
     const snap = await safeGet("events");
     if (!snap || snap.empty) {
-      container.innerHTML = emptyState("No events posted yet — check back soon.");
+      container.innerHTML = emptyState(t("common.noEvents", "No events posted yet — check back soon."));
       return;
     }
     container.innerHTML = "";
@@ -83,10 +83,10 @@ const RENDERERS = {
   },
 
   projects: async function (container) {
-    container.innerHTML = "<p class='muted'>Loading…</p>";
+    container.innerHTML = "<p class='muted'>" + t('common.loading','Loading…') + "</p>";
     const snap = await safeGet("projects");
     if (!snap || snap.empty) {
-      container.innerHTML = emptyState("No projects posted yet.");
+      container.innerHTML = emptyState(t("common.noProjects", "No projects posted yet."));
       return;
     }
     container.innerHTML = "";
@@ -107,10 +107,10 @@ const RENDERERS = {
   },
 
   members: async function (container) {
-    container.innerHTML = "<p class='muted'>Loading…</p>";
+    container.innerHTML = "<p class='muted'>" + t('common.loading','Loading…') + "</p>";
     const snap = await safeGet("members");
     if (!snap || snap.empty) {
-      container.innerHTML = emptyState("No members listed yet.");
+      container.innerHTML = emptyState(t("common.noMembers", "No members listed yet."));
       return;
     }
     container.innerHTML = "";
@@ -127,10 +127,10 @@ const RENDERERS = {
   },
 
   opportunities: async function (container) {
-    container.innerHTML = "<p class='muted'>Loading…</p>";
+    container.innerHTML = "<p class='muted'>" + t('common.loading','Loading…') + "</p>";
     const snap = await safeGet("opportunities");
     if (!snap || snap.empty) {
-      container.innerHTML = emptyState("No opportunities posted yet.");
+      container.innerHTML = emptyState(t("common.noOpportunities", "No opportunities posted yet."));
       return;
     }
     container.innerHTML = "";
@@ -151,10 +151,10 @@ const RENDERERS = {
   },
 
   links: async function (container) {
-    container.innerHTML = "<p class='muted'>Loading…</p>";
+    container.innerHTML = "<p class='muted'>" + t('common.loading','Loading…') + "</p>";
     const snap = await safeGet("links");
     if (!snap || snap.empty) {
-      container.innerHTML = emptyState("No links added yet.");
+      container.innerHTML = emptyState(t("common.noLinks", "No links added yet."));
       return;
     }
     container.innerHTML = "";
@@ -202,11 +202,24 @@ const RENDERERS = {
       '</div></div>';
   },
 
+  qrCode: async function (container) {
+    let imgSrc = typeof DEFAULT_QR_IMAGE !== "undefined" ? DEFAULT_QR_IMAGE : "";
+    try {
+      const doc = await db.collection("settings").doc("links").get();
+      if (doc.exists && doc.data().qrCodeImage) imgSrc = doc.data().qrCodeImage;
+    } catch (err) {
+      console.error("Couldn't load QR code setting", err);
+    }
+    if (!imgSrc) { container.innerHTML = ""; return; }
+    container.innerHTML =
+      '<img src="' + imgSrc + '" alt="Scan to follow" style="width:170px; height:170px; border-radius:14px; border:1px solid var(--line); background:#fff; padding:10px; object-fit:contain;">';
+  },
+
   memories: async function (container) {
-    container.innerHTML = "<p class='muted'>Loading…</p>";
+    container.innerHTML = "<p class='muted'>" + t('common.loading','Loading…') + "</p>";
     const snap = await safeGet("memories");
     if (!snap || snap.empty) {
-      container.innerHTML = emptyState("No memories posted yet — this page fills up as the club runs events.");
+      container.innerHTML = emptyState(t("common.noMemories", "No memories posted yet — this page fills up as the club runs events."));
       return;
     }
     container.innerHTML = "";
@@ -375,6 +388,17 @@ async function safeGet(collectionName) {
 }
 function emptyState(msg) {
   return "<div class='slot'>" + escapeHtml(msg) + "</div>";
+}
+function t(key, fallback) {
+  try {
+    const lang = document.documentElement.lang || localStorage.getItem("sun_lang") || "en";
+    const dict = (typeof I18N !== "undefined" && (I18N[lang] || I18N.en)) || null;
+    if (!dict) return fallback;
+    const val = key.split(".").reduce(function (o, k) { return o && o[k] !== undefined ? o[k] : null; }, dict);
+    return val != null ? val : fallback;
+  } catch (e) {
+    return fallback;
+  }
 }
 function initials(name) {
   if (!name) return "?";

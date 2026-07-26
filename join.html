@@ -48,32 +48,32 @@
 
 <section class="section" style="padding-top:0;">
   <div class="card join-card">
-    <a href="#" class="btn btn-primary">[ Join via Discord → ]</a>
+    <a href="#" class="btn btn-primary" data-i18n="joinForm.cta">[ Join via Discord → ]</a>
 
     <form id="join-form" class="form-row">
       <div>
-        <label for="name">Full name</label>
+        <label for="name" data-i18n="joinForm.name">Full name</label>
         <input type="text" id="name" name="name" required>
       </div>
       <div>
-        <label for="email">School email</label>
+        <label for="email" data-i18n="joinForm.email">School email</label>
         <input type="email" id="email" name="email" required>
       </div>
       <div>
-        <label for="track">Which lab interests you most?</label>
+        <label for="track" data-i18n="joinForm.track">Which lab interests you most?</label>
         <select id="track" name="track">
           <option>Nanoscience</option>
           <option>Robotics</option>
           <option>Code</option>
           <option>Health</option>
-          <option>Not sure yet</option>
+          <option data-i18n="joinForm.notSure">Not sure yet</option>
         </select>
       </div>
       <div>
-        <label for="note">Anything you want to build or learn?</label>
+        <label for="note" data-i18n="joinForm.note">Anything you want to build or learn?</label>
         <textarea id="note" name="note" rows="3"></textarea>
       </div>
-      <button type="submit" class="btn btn-primary" style="margin-top:6px;">Submit</button>
+      <button type="submit" class="btn btn-primary" style="margin-top:6px;" data-i18n="joinForm.submit">Submit</button>
       <p id="join-status" class="form-note"></p>
     </form>
   </div>
