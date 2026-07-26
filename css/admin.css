@@ -128,7 +128,31 @@
 .field-row input:focus,
 .field-row select:focus,
 .field-row textarea:focus{ outline:none; border-color:var(--cyan); }
-.field-row input[type="file"]{ padding:8px 0; border:none; }
+.field-row input[type="file"]{
+  padding:9px 0; border:none;
+  color:var(--ink-1);
+  font-size:13px;
+  font-family:inherit;
+}
+.field-row input[type="file"]::file-selector-button,
+input[type="file"]::file-selector-button{
+  background:linear-gradient(90deg, var(--indigo), var(--cyan));
+  color:#050308;
+  border:none;
+  border-radius:999px;
+  padding:8px 18px;
+  font-weight:700;
+  font-size:12.5px;
+  font-family:inherit;
+  cursor:pointer;
+  margin-right:14px;
+  transition:opacity .15s, transform .15s;
+}
+.field-row input[type="file"]::file-selector-button:hover,
+input[type="file"]::file-selector-button:hover{
+  opacity:0.85;
+  transform:translateY(-1px);
+}
 .current-photo{
   width:70px; height:70px;
   object-fit:cover;

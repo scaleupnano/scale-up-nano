@@ -62,7 +62,24 @@ const RENDERERS = {
 
       if (Array.isArray(d.formFields) && d.formFields.length) {
         if (d.status === "Scheduled") {
-          card.appendChild(buildActivityForm(doc.id, d.formFields));
+          const toggleBtn = document.createElement("button");
+          toggleBtn.type = "button";
+          toggleBtn.className = "btn btn-primary btn-small";
+          toggleBtn.style.marginTop = "16px";
+          toggleBtn.textContent = "Fill the form now";
+
+          const formWrap = document.createElement("div");
+          formWrap.style.display = "none";
+          formWrap.appendChild(buildActivityForm(doc.id, d.formFields));
+
+          toggleBtn.addEventListener("click", function () {
+            const opening = formWrap.style.display === "none";
+            formWrap.style.display = opening ? "block" : "none";
+            toggleBtn.textContent = opening ? "Hide form" : "Fill the form now";
+          });
+
+          card.appendChild(toggleBtn);
+          card.appendChild(formWrap);
         } else if (d.status === "Delayed") {
           const note = document.createElement("p");
           note.className = "form-status muted small";
@@ -217,6 +234,7 @@ const RENDERERS = {
         '<div class="countdown-unit"><div class="countdown-num" data-unit="m">--</div><div class="countdown-label">Minutes</div></div>' +
         '<div class="countdown-unit"><div class="countdown-num" data-unit="s">--</div><div class="countdown-label">Seconds</div></div>' +
       '</div>' +
+      '<a href="events.html" class="btn btn-ghost btn-small" style="margin-top:18px;">Learn more →</a>' +
       '</div>';
 
     startCountdown(container, next.date + "T" + (next.time || "00:00"));
