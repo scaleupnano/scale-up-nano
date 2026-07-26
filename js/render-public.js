@@ -185,21 +185,41 @@ const RENDERERS = {
   nextEvent: async function (container) {
     const snap = await safeGet("events");
     if (!snap || snap.empty) {
-      container.innerHTML = emptyState("No upcoming session posted yet — check the Activities page.");
+      container.innerHTML = emptyState(t("common.noEvents", "No upcoming event posted yet — check the Events page."));
       return;
     }
-    const upcoming = snap.docs.map(function (d) { return d.data(); })
-      .find(function (d) { return d.status === "Upcoming" || !d.status; }) || snap.docs[0].data();
+    const events = snap.docs.map(function (d) { return d.data(); });
+    const scheduled = events
+      .filter(function (d) { return d.status === "Scheduled" && d.date; })
+      .sort(function (a, b) {
+        return new Date(a.date + "T" + (a.time || "00:00")) - new Date(b.date + "T" + (b.time || "00:00"));
+      });
+    const next = scheduled[0];
+
+    if (!next) {
+      container.innerHTML = emptyState(t("common.noEvents", "No Scheduled event right now — check the Events page."));
+      return;
+    }
+
     container.innerHTML =
-      '<div class="card">' +
-      (upcoming.tag ? '<span class="tag">' + escapeHtml(upcoming.tag) + '</span>' : '') +
-      '<h3>' + escapeHtml(upcoming.title || "") + '</h3>' +
-      '<p>' + escapeHtml(upcoming.description || "") + '</p>' +
+      '<div class="card countdown-card">' +
+      (next.tag ? '<span class="tag">' + escapeHtml(next.tag) + '</span>' : '') +
+      '<h3>' + escapeHtml(next.title || "") + '</h3>' +
+      '<p>' + escapeHtml(next.description || "") + '</p>' +
       '<div class="meta">' +
-        (upcoming.date ? '<span>📅 ' + escapeHtml(upcoming.date) + '</span>' : '') +
-        (upcoming.time ? '<span>🕒 ' + escapeHtml(upcoming.time) + '</span>' : '') +
-        (upcoming.location ? '<span>📍 ' + escapeHtml(upcoming.location) + '</span>' : '') +
-      '</div></div>';
+        (next.date ? '<span>📅 ' + escapeHtml(next.date) + '</span>' : '') +
+        (next.time ? '<span>🕒 ' + escapeHtml(next.time) + '</span>' : '') +
+        (next.location ? '<span>📍 ' + escapeHtml(next.location) + '</span>' : '') +
+      '</div>' +
+      '<div class="countdown-grid" id="countdown-grid">' +
+        '<div class="countdown-unit"><div class="countdown-num" data-unit="d">--</div><div class="countdown-label">Days</div></div>' +
+        '<div class="countdown-unit"><div class="countdown-num" data-unit="h">--</div><div class="countdown-label">Hours</div></div>' +
+        '<div class="countdown-unit"><div class="countdown-num" data-unit="m">--</div><div class="countdown-label">Minutes</div></div>' +
+        '<div class="countdown-unit"><div class="countdown-num" data-unit="s">--</div><div class="countdown-label">Seconds</div></div>' +
+      '</div>' +
+      '</div>';
+
+    startCountdown(container, next.date + "T" + (next.time || "00:00"));
   },
 
   qrCode: async function (container) {
@@ -386,6 +406,33 @@ async function safeGet(collectionName) {
     return null;
   }
 }
+function startCountdown(container, targetIso) {
+  const target = new Date(targetIso).getTime();
+  const grid = container.querySelector("#countdown-grid");
+  if (!grid) return;
+
+  function tick() {
+    if (!document.body.contains(grid)) { clearInterval(timer); return; }
+    const diff = target - Date.now();
+    if (diff <= 0) {
+      grid.innerHTML = "<div style='grid-column:1/-1; color:var(--cyan); font-weight:700;'>Starting now!</div>";
+      clearInterval(timer);
+      return;
+    }
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    const set = function (unit, val) {
+      const el = grid.querySelector('[data-unit="' + unit + '"]');
+      if (el) el.textContent = String(val).padStart(2, "0");
+    };
+    set("d", d); set("h", h); set("m", m); set("s", s);
+  }
+  tick();
+  const timer = setInterval(tick, 1000);
+}
+
 function emptyState(msg) {
   return "<div class='slot'>" + escapeHtml(msg) + "</div>";
 }
