@@ -43,7 +43,7 @@ els.logoutBtn.addEventListener("click", function () {
 });
 
 /* ---------- Tab scaffolding ---------- */
-const TAB_ORDER = ["members", "projects", "events", "opportunities", "links", "qrCode", "memories", "memorySubmissions", "joinRequests"];
+const TAB_ORDER = ["members", "projects", "events", "opportunities", "links", "qrCode", "memories", "memorySubmissions", "joinRequests", "texts"];
 const TAB_LABELS = {
   members: "Members",
   projects: "Projects",
@@ -53,7 +53,8 @@ const TAB_LABELS = {
   qrCode: "QR Code",
   memories: "Memories",
   memorySubmissions: "Memory submissions",
-  joinRequests: "Join requests"
+  joinRequests: "Join requests",
+  texts: "Texts"
 };
 
 function buildTabs() {
@@ -92,6 +93,8 @@ function switchTab(key) {
     renderMemorySubmissions(panel);
   } else if (key === "qrCode") {
     renderQrCodePanel(panel);
+  } else if (key === "texts") {
+    renderTextsPanel(panel);
   } else {
     renderCollectionPanel(key, panel);
   }
@@ -590,6 +593,124 @@ async function renderMemorySubmissions(panel) {
     actions.appendChild(rejectBtn);
 
     listEl.appendChild(row);
+  });
+}
+
+/* ---------- Texts (site copy editor) ---------- */
+function getPath(obj, path) {
+  return path.split(".").reduce(function (o, k) { return o && o[k] !== undefined ? o[k] : null; }, obj);
+}
+let textsState = { category: Object.keys(TEXT_SCHEMA)[0], lang: "en", overrides: null };
+
+async function renderTextsPanel(panel) {
+  panel.innerHTML =
+    '<div class="panel-head"><h2>Texts</h2>' +
+    '<p class="muted">Edit the site\'s built-in copy — headings, buttons, empty-state messages — without touching any code. ' +
+    'Anything you don\'t change here just keeps using the default wording.</p></div>' +
+    '<div id="texts-cats" class="admin-tabs" style="padding:0 0 14px;"></div>' +
+    '<div id="texts-langs" class="pill-picker" style="margin-bottom:20px;"></div>' +
+    '<div id="texts-fields"></div>' +
+    '<div class="form-actions" style="margin-top:18px;">' +
+      '<button id="texts-save" class="btn btn-primary">Save changes</button>' +
+      '<button id="texts-reset" class="btn btn-ghost">Reset this section to default</button>' +
+    '</div>' +
+    '<p id="texts-status" class="muted small" style="margin-top:10px;"></p>';
+
+  if (!textsState.overrides) {
+    try {
+      const doc = await withTimeout(db.collection("settings").doc("texts").get(), "Loading");
+      textsState.overrides = (doc.exists && doc.data()) || {};
+    } catch (err) {
+      textsState.overrides = {};
+      document.getElementById("texts-status").textContent = "Couldn't load saved overrides: " + err.message;
+    }
+  }
+
+  const catsBox = document.getElementById("texts-cats");
+  Object.keys(TEXT_SCHEMA).forEach(function (catKey) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "tab-btn" + (catKey === textsState.category ? " active" : "");
+    btn.textContent = TEXT_SCHEMA[catKey].label;
+    btn.addEventListener("click", function () {
+      textsState.category = catKey;
+      renderTextsPanel(panel);
+    });
+    catsBox.appendChild(btn);
+  });
+
+  const langsBox = document.getElementById("texts-langs");
+  TEXT_LANGUAGES.forEach(function (l) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "pill-option" + (l.value === textsState.lang ? " active" : "");
+    btn.textContent = l.label;
+    btn.addEventListener("click", function () {
+      textsState.lang = l.value;
+      renderTextsPanel(panel);
+    });
+    langsBox.appendChild(btn);
+  });
+
+  const fieldsBox = document.getElementById("texts-fields");
+  const schema = TEXT_SCHEMA[textsState.category];
+  const langOverrides = (textsState.overrides[textsState.lang]) || {};
+
+  schema.fields.forEach(function (field) {
+    const defaultVal = getPath(I18N[textsState.lang] || I18N.en, field.key) || "";
+    const currentVal = langOverrides[field.key] != null ? langOverrides[field.key] : defaultVal;
+
+    const row = document.createElement("div");
+    row.className = "field-row";
+    const label = document.createElement("label");
+    label.textContent = field.label + (langOverrides[field.key] != null ? "  •  edited" : "");
+    row.appendChild(label);
+
+    const input = (field.type === "textarea") ? document.createElement("textarea") : document.createElement("input");
+    if (field.type !== "textarea") input.type = "text";
+    else input.rows = 3;
+    input.value = currentVal;
+    input.dataset.key = field.key;
+    row.appendChild(input);
+    fieldsBox.appendChild(row);
+  });
+
+  document.getElementById("texts-save").addEventListener("click", async function () {
+    const btn = this;
+    btn.disabled = true;
+    btn.textContent = "Saving…";
+    const updated = Object.assign({}, langOverrides);
+    fieldsBox.querySelectorAll("[data-key]").forEach(function (el) {
+      updated[el.dataset.key] = el.value;
+    });
+    try {
+      await withTimeout(
+        db.collection("settings").doc("texts").set({ [textsState.lang]: updated }, { merge: true }),
+        "Saving"
+      );
+      textsState.overrides[textsState.lang] = updated;
+      document.getElementById("texts-status").textContent = "Saved.";
+    } catch (err) {
+      document.getElementById("texts-status").textContent = "Couldn't save: " + err.message;
+    }
+    btn.disabled = false;
+    btn.textContent = "Save changes";
+  });
+
+  document.getElementById("texts-reset").addEventListener("click", async function () {
+    if (!confirm("Reset every field in \"" + schema.label + "\" (" + textsState.lang.toUpperCase() + ") back to the default wording?")) return;
+    const updated = Object.assign({}, langOverrides);
+    schema.fields.forEach(function (field) { delete updated[field.key]; });
+    try {
+      await withTimeout(
+        db.collection("settings").doc("texts").set({ [textsState.lang]: updated }, { merge: true }),
+        "Saving"
+      );
+      textsState.overrides[textsState.lang] = updated;
+      renderTextsPanel(panel);
+    } catch (err) {
+      alert("Couldn't reset: " + err.message);
+    }
   });
 }
 

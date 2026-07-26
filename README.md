@@ -103,7 +103,8 @@ Settings → Pages should already be correctly configured from last time
 1. Visit `https://scaleupnano.github.io/scale-up-nano/admin.html`
 2. Sign in with the email/password you created in Part 1, step 6
 3. Use the tabs across the top: **Members, Projects, Events & formulas,
-   Opportunities, Links, Memories, Memory submissions, Join requests**
+   Opportunities, Links, QR Code, Memories, Memory submissions,
+   Join requests, Texts**
 
 For each of the first six tabs: fill out the form at the top to add a new
 entry (photos upload directly — just pick a file), and existing entries
@@ -133,6 +134,20 @@ list below with **Edit** and **Delete** buttons.
 ### Join requests
 Anyone who submits the Join page's form shows up here — name, email,
 which track they're interested in, and their note. Delete once handled.
+
+### Texts — editing the site's built-in copy
+- Pick a category (Home, Events, Join, etc.) along the top, then a
+  language (EN / FR / AR) below it.
+- Every field shows its current wording — the built-in default until you
+  change it. Edit any field and hit **Save changes**; a field you've
+  edited gets a small "• edited" mark next to its label so you can see
+  at a glance what's been customized.
+- **"Reset this section to default"** clears every field in that
+  category+language back to the built-in wording — useful if you want
+  to undo a batch of edits at once.
+- This is genuinely how the language switcher gets its text now — your
+  edits are layered on top of the defaults at page-load time, so nothing
+  you change here ever needs a GitHub commit or redeploy.
 
 ---
 
